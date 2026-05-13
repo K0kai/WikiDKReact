@@ -1,0 +1,232 @@
+.dropdown-arrow {
+    margin-left: 8px;
+    transition: transform 0.2s ease;
+}
+
+.dropdown-arrow.open{
+    transform: rotate(90deg);
+}
+
+.dropdown{
+    position: relative;
+    display: inline-block;
+    max-height: 0;
+}
+.dropdown-content {
+  
+  position: relative;
+  background-color: #1f1f2b;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+  padding: 0;
+  border: 0;
+  margin: 0;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.2s ease;
+  
+}
+
+.dropdown-content.open{
+    max-height: 500px;
+}
+
+.highlightsbar{
+    max-height: 30px;
+}
+.Banner{
+    max-height: 500px;
+    margin-left: 10vw;
+}
+.Title{
+    font-size: 48px;
+    font-family: 'Cinzel Decorative', serif;
+    margin-left: 10vw;
+    
+}
+
+.home-page {
+  min-height: 100vh;
+  background: #0e0e0f;
+  color: #d0cfc8;
+}
+
+.home-content {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 40px 24px 60px;
+}
+
+.home-section-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 28px;
+}
+
+.home-section-header h2 {
+  font-family: 'Cinzel', serif; /* or your existing wiki header font */
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: #8a8880;
+  white-space: nowrap;
+}
+
+.home-section-header::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, #2e2e36, transparent);
+}
+
+.home-groups-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2px;
+}
+
+.home-group-card {
+  background: #141416;
+  border: 1px solid #222228;
+  padding: 24px 26px;
+  position: relative;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+  overflow: hidden;
+}
+
+.home-group-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 3px; height: 100%;
+  background: #c8b47a; /* swap for your accent color */
+  transform: scaleY(0);
+  transform-origin: bottom;
+  transition: transform 0.25s ease;
+}
+
+.home-group-card:hover {
+  background: #191920;
+  border-color: #35353e;
+}
+
+.home-group-card:hover::before {
+  transform: scaleY(1);
+}
+
+.home-group-card.locked {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.home-group-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #eae7de;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.home-lock-icon {
+  font-size: 0.75rem;
+  color: #5a5a62;
+}
+
+.home-group-desc {
+  font-size: 0.82rem;
+  color: #6e6d68;
+  line-height: 1.55;
+  font-weight: 300;
+}
+
+.home-group-count {
+  margin-top: 16px;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  color: #c8b47a;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+.home-back-btn {
+  background: none;
+  border: none;
+  color: #c8b47a;
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  padding: 0;
+  white-space: nowrap;
+  margin-bottom: 30px;
+}
+.home-back-btn:hover { color: #eae7de; }
+
+.home-group-desc--hero {
+  margin-bottom: 24px;
+  font-size: 0.9rem;
+  color: #5e5d58;
+}
+
+.home-articles-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.home-article-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: #141416;
+  border: 1px solid #222228;
+  padding: 16px 20px;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+.home-article-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 3px; height: 100%;
+  background: #c8b47a;
+  transform: scaleY(0);
+  transform-origin: bottom;
+  transition: transform 0.25s ease;
+}
+.home-article-card:hover { background: #191920; border-color: #35353e; }
+.home-article-card:hover::before { transform: scaleY(1); }
+
+.home-article-thumb {
+  width: 56px;
+  height: 56px;
+  object-fit: cover;
+  border: 1px solid #2e2e36;
+  flex-shrink: 0;
+}
+
+.home-article-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #eae7de;
+  margin-bottom: 4px;
+}
+
+.home-article-meta {
+  font-size: 0.75rem;
+  color: #5e5d58;
+  letter-spacing: 0.08em;
+}
+
+.home-empty {
+  color: #4a4a52;
+  font-size: 0.85rem;
+  padding: 20px 0;
+}

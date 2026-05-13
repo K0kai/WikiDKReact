@@ -1,0 +1,359 @@
+body {
+  padding-top: 130px;
+  scroll-behavior: auto;
+  margin: 0;
+}
+
+ body {
+    min-height: 100vh;
+    background-color: #0e0d0b;
+    position: relative;
+  }
+ 
+  /* ── Camada 1: textura de ruído granulado (SVG inline como data URI) ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    background-size: 400px 400px;
+    pointer-events: none;
+    z-index: -2;
+  }
+ 
+  /* ── Camada 2: vinheta radial escurecendo as bordas ── */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 75% at 50% 50%,
+        transparent 30%,
+        rgba(6,5,4,0.55) 70%,
+        rgba(4,3,2,0.88) 100%);
+    pointer-events: none;
+    z-index: -1;
+  }
+
+:root {
+  --text: #dadada;
+  --text-h: #08060d;
+  --bg: #fff;
+  --border: #e5e4e7;
+  --code-bg: #f4f3ec;
+  --accent: #aa3bff;
+  --accent-bg: rgba(170, 59, 255, 0.1);
+  --accent-border: rgba(170, 59, 255, 0.5);
+  --social-bg: rgba(244, 243, 236, 0.5);
+  --shadow:
+    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+
+  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
+  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
+  --mono: ui-monospace, Consolas, monospace;
+
+  font: 18px/145% var(--sans);
+  letter-spacing: 0.18px;
+  color-scheme: light dark;
+  color: var(--text);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  @media (max-width: 1024px) {
+    font-size: 16px;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --text: #b4b2a2;
+    --text-h: #f7f7f7;
+    --bg: #000000;
+    --semiTrBg: #0000005b;
+    --border: #2e303a;
+    --code-bg: #1f2028;
+    --accent: #c084fc;
+    --accent-bg: rgba(192, 132, 252, 0.15);
+    --accent-border: rgba(192, 132, 252, 0.5);
+    --social-bg: rgba(47, 48, 58, 0.5);
+    --shadow:
+      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
+  }
+
+  #social .button-icon {
+    filter: invert(1) brightness(2);
+  }
+}
+
+#root {
+  width: 1126px;
+  max-width: 100%;
+  margin: 0 auto;
+  margin-left: 0px;
+  text-align: center;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+h1,
+h2 {
+  font-family: var(--heading);
+  font-weight: 500;
+  color: var(--text-h);
+}
+
+h1 {
+  font-size: 56px;
+  letter-spacing: -1.68px;
+  margin: 32px 0;
+  @media (max-width: 1024px) {
+    font-size: 36px;
+    margin: 20px 0;
+  }
+}
+h2 {
+  font-size: 24px;
+  line-height: 118%;
+  letter-spacing: -0.24px;
+  margin: 0 0 8px;
+  @media (max-width: 1024px) {
+    font-size: 20px;
+  }
+}
+p {
+  margin: 0;
+}
+
+code,
+.counter {
+  font-family: var(--mono);
+  display: inline-flex;
+  border-radius: 4px;
+  color: var(--text-h);
+}
+
+code {
+  font-size: 15px;
+  line-height: 135%;
+  padding: 4px 8px;
+  background: var(--code-bg);
+}
+
+.user-icon
+{
+  width: 32px;
+  height: 32px;
+}
+
+.subt-small{
+  font-size: 12px;
+}
+
+.semitransparent{
+  background-color: rgba(244, 243, 236, 0.2);
+}
+
+.bigbutton{
+  width: 96px;
+  height: 36px;
+}
+
+.tallbutton{
+  height: 36px;
+  width: auto;
+}
+
+.maxwidth{
+  width: 100%;
+}
+
+.width90{
+  width: 90%;
+
+}
+
+.pthover:hover{
+  cursor: pointer;
+}
+
+.nobg{
+  background-color: transparent;
+}
+
+.noborder{
+  border: 0 transparent;
+}
+
+.nopad{
+  padding: 0;
+}
+
+.nooutline{
+  outline: none;
+}
+
+.font-large{
+  font-size:large;
+}
+.yellowtint{
+  filter: brightness(0) saturate(100%) invert(78%) sepia(91%) saturate(823%) hue-rotate(358deg) brightness(104%) contrast(107%);
+}
+.whitetint{
+  filter: brightness(0) saturate(100%) invert(99%) sepia(0%) saturate(1551%) hue-rotate(215deg) brightness(120%) contrast(100%);
+}
+.redtint{
+  filter: brightness(0) saturate(100%) invert(19%) sepia(57%) saturate(2696%) hue-rotate(341deg) brightness(120%) contrast(93%);
+}
+.graytint{
+  filter: brightness(0) saturate(100%) invert(79%) sepia(0%) saturate(1064%) hue-rotate(219deg) brightness(97%) contrast(91%);
+}
+.greentint{
+  filter: brightness(0) saturate(100%) invert(40%) sepia(11%) saturate(2229%) hue-rotate(69deg) brightness(103%) contrast(100%);
+}
+.inline-flex{
+  display: inline-flex;
+}
+
+.smallicon{
+  width: 16px;
+  height: 16px;
+}
+
+.slightlymediumicon{
+  width:20px;
+  height:20px;
+}
+
+.mediumicon{
+  width: 32px;
+  height: 32px;
+}
+
+.flex-direction-column{
+  flex-direction: column;
+}
+.gap20{
+  gap:20px
+}
+.gap40{
+  gap:40px;
+}
+.gap10{
+  gap:10px
+}
+.gap15{
+  gap:15px
+}
+.margin-top30{
+  margin-top: 30px;
+}
+.margin-top15{
+  margin-top:15px;
+}
+.margin-left15{
+  margin-left:15px;
+}
+.margin-down20{
+  margin-bottom:20px;
+}
+.margin-right15{
+  margin-right:15px;
+}
+.margin-right5{
+  margin-right: 5px;
+}
+.padding2{
+  padding: 2px;
+}
+
+.align-center{
+  align-items: center;
+}
+.align-left{
+  align-items: left;
+}
+
+.justify-content-left{
+  justify-content: left;
+}
+.justify-content-center{
+  justify-content: center;
+}
+.justify-self-center{
+  justify-self: center;
+}
+
+
+
+.grid2fr{
+  display: grid;
+  grid-template-columns: 80% 20%;
+}
+
+.grid{
+  display: grid;
+}
+
+.g8005{
+  grid-template-columns: 80% 5%;
+}
+.g5005{
+  grid-template-columns: 50% 5%;
+}
+
+.column{
+  flex-direction: column;
+}
+.row{
+  flex-direction: row;
+}
+
+.fontsmall{
+  font-size: 12px;
+}
+.fontmsmall{
+  font-size: 18px;
+}
+.xbigimage{
+  height: 160px;
+  width: 160px;
+}
+.circular{
+  border-radius:50%;
+}
+.greybg{
+  background-color: #29313f94;
+}
+.width90{
+  width: 90%;
+}
+.width95{
+  width: 95%;
+}
+.fontgermania{
+  font-family: 'Germania One', serif;
+}
+.fontcinzel{
+  font-family: 'Cinzel Decorative', serif;
+}
+.fontinter{
+  font-family: 'Inter', sans-serif;
+}
+
+.gothborder {
+  border: 20px solid transparent;
+
+  border-image-source: url("/src/assets/border_gpt.png");
+
+  border-image-slice: 130;
+}

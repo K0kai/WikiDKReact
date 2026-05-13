@@ -1,0 +1,118 @@
+.article-thumb{
+    width: auto;
+    max-height: 200px;
+    max-width: 170px;
+    object-fit: cover;
+    margin-right: 20px;
+}
+.article-card{
+    max-width: 180px;
+    padding: 10px;
+    border-radius: 8px;
+    background-color: var(--bg);
+    border: 1px solid var(--border);
+    overflow: hidden;
+}
+.article-card h2{
+    text-overflow: ellipsis;
+    max-width: 170px;
+}
+.article-card:hover{
+    background-color:rgb(71, 71, 71);
+    cursor: pointer;
+}
+.articles-pageview{
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    gap: 10px;
+    margin-top: 50px;
+    width: 1000px;
+}
+.articlectr{
+    overflow:auto;
+    min-width: 700px;
+    width: 150%
+}
+
+
+.widebar{
+    width: 250px;
+    height: 20px;
+    transition: width 0.1s ease;
+    margin-right: 20px;
+}
+.widebar:focus{
+    width:300px;
+    outline: none;    
+}
+
+.strip{
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height: auto;
+    border-bottom: 1px solid;
+    border-color: rgba(255,255,255,0.25);    
+}
+
+.margin-bottom-90{
+    margin-bottom: 90px;
+}
+.margin-bottom-45{
+    margin-bottom: 45px;
+}
+.margin-left-10{
+    margin-left: 10px;
+}
+
+.flex{
+    display: flex;
+}
+.flex .side-by-side{
+    flex-direction: row;
+}
+
+.highlightstar{
+    transition: transform 0.3s ease;
+    width:60px
+}
+.highlightstar:hover{
+    transform:rotate(360deg) ;
+}
+.unhighlightstar{
+    transition: height 0.2s ease;
+    width: auto;
+}
+.unhighlightstar:hover{
+    height: 28px;
+}
+.category-container{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+.category-filters{
+    overflow:auto;
+    max-width: 250px;
+}
+.search-container{
+    padding-top: 85px;
+    height: 50px;
+    margin-left: 50px;
+}
+.preview {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 5;
+    -webkit-box-orient: vertical;
+}
+.greenhover:hover{
+    background-color: rgba(63, 131, 61, 0.233);
+}
+
+.bottom-right-star{
+    position: relative;
+    left: 70px;
+}

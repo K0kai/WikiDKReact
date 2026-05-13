@@ -1,0 +1,83 @@
+.article-title{
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+.article-content{
+    font-size: 16px;
+    line-height: 1.5;
+}
+.article-updated{
+    font-size: 14px;
+    color: #808080;
+}
+.buttons-ui {
+    position: relative;
+    top: 15px;
+    right: 15px;
+
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+
+    padding: 8px 10px;
+    border-radius: 12px;
+}
+@media (max-width: 600px) {
+    .buttonimg {
+        width: 20px;
+    }
+
+    .buttonimg:hover {
+        width: 21px;
+    }
+
+    .buttons-ui {
+        top: 10px;
+        right: 10px;
+        gap: 8px;
+    }
+}
+.buttonimg{
+    width: 24px;
+    filter: brightness(0) saturate(100%) invert(46%) sepia(0%) saturate(1055%) hue-rotate(188deg) brightness(95%) contrast(76%);
+}
+.trash{
+    filter: brightness(0) saturate(100%) invert(19%) sepia(57%) saturate(2696%) hue-rotate(341deg) brightness(120%) contrast(93%);
+    width: 23px;
+}
+.buttonimg:hover{
+    width: 25px;
+}
+.transparent{
+    background-color: transparent;
+    border-color: transparent;
+}
+.btn{
+    padding: 0;
+    margin: 0;
+}
+.btn:hover{
+    cursor:pointer;
+}
+
+.markdown-body {
+    max-width: 900px;
+    margin: auto;
+}
+
+.markdown-body p {
+    margin-bottom: 1rem;
+    line-height: 1.7;
+}
+
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3 {
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+}
+
+.markdown-body h1 {
+    font-size: 2.5rem;
+}

@@ -1,0 +1,108 @@
+.mainContainer {
+    display: flex;
+    flex-direction: column;
+    justify-self: center;
+}
+
+.title-input {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    width: 500px;
+    outline: none;
+}
+
+.content-input {
+    height: 300px;
+    width: 500px;
+    scroll-behavior: auto;
+    color: gainsboro;
+    border-radius: 5px;
+
+}
+
+.link-input {
+    width: 500px;
+    outline: none;
+}
+
+.content-input:focus,
+.title-input:focus,
+.link-input:focus {
+    outline-color: rgb(80, 80, 80);
+    outline-style: solid;
+    outline-width: 1px;
+}
+
+.gbluebg {
+    background-color: rgb(43, 42, 54);
+}
+
+.noborder {
+    border: 0;
+}
+
+.btns-container {
+    display: flex;
+    justify-content: center;
+    gap: 50px;
+    margin-top: 50px;
+}
+
+.save {
+    background-color: rgba(0, 255, 0, 0.15);
+    font-weight: bold;
+    border-radius: 5px;
+}
+
+.save:hover {
+    background-color: rgba(0, 255, 0, 0.35);
+}
+
+.discard:hover {
+    background-color: rgba(235, 11, 11, 0.35);
+}
+
+.discard {
+    background-color: rgba(235, 11, 11, 0.15);
+    font-weight: bold;
+    border-radius: 5px;
+}
+
+.preview {
+    background-color: rgba(110, 110, 110, 0.15);
+    font-weight: bold;
+    border-radius: 5px;
+}
+
+.preview:hover {
+    background-color: rgba(110, 110, 110, 0.35);
+}
+
+.previewImage {
+    width: 500px;
+    height: 500px;
+    outline: none;
+}
+
+.groupBoxes {
+    margin-top: 20px;
+    padding: 4px;
+    border-top: 1px solid;
+    display: flex;
+    flex-direction: column;
+    align-items: left;
+
+
+}
+
+.posright50 {
+    position: relative;
+    right:50px;
+}
+
+.formGroupBox {
+    display: flex;
+    align-self: left;
+    justify-self: left;
+}
