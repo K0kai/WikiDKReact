@@ -7,61 +7,44 @@ import editIcon from "../assets/edit-icon.png"
 import trashIcon from "../assets/trash-icon.png"
 import type { Article } from "../types/article";
 import remarkGfm from "remark-gfm";
+import { ArticleContext } from "../context/ArticleContext";
 
 
 
 
 
 function ArticlePage(){
-    const [article, setArticle] = useState<Article | null>(null);
-    const { id } = useParams<{ id: string }>();
+  const articleContext = useContext(ArticleContext);
+   const { id } = useParams<{ id: string }>();
     const articleId = parseInt(id || '0');
-    async function getArticleById(id: number){
-        var resp = await fetch(`http://localhost:5119/articles/get/${id}`)
-        if (!resp.ok){
-            throw new Error(`Failed to fetch article with id ${id}: ${resp.statusText}`);
-        }
-        var article = await resp.json() as Article;
-        setArticle(article);
-        return article;
-    }
+    const [article, setArticle] = useState<Article | null>(articleContext?.articles.filter(a => a.id == articleId)[0] ?? null);
 
     useEffect(() => {
-        if (articleId > 0){
-            getArticleById(articleId).catch(err => console.error(err));
-        }
-    },[id]);
+      setArticle(articleContext?.articles.filter(a => a.id == articleId)[0] ?? null)
+
+    },[id])
+   
 
   function ManageButtons() {
     const navigate = useNavigate();
     var authContext = useContext(AuthContext);
     if (!authContext?.hasRole(1)) return null;
 
-    async function deleteArticle() {
-      var action = confirm("Essa ação é irreversível, continuar mesmo assim?")
-      if (action) {
-        const token = localStorage.getItem("token");
-        if (!token) {
-          alert("Unauthorized action");
-          return;
-        }
-        var resp = await fetch(`http://localhost:5119/articles/delete/${id}`, {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        if (resp.ok){
-          navigate(-1);
-          alert("Deleted successfully");
-          
-        }else{
-          console.error(`${resp.status} ${await resp.text()}`)
-        }
-      }
-      else
+    async function handleDelete(){
+      var con = confirm("Essa ação é irreversível, deseja prosseguir?")
+      if (!con)
         return;
+      var result = await articleContext?.deleteArticle(articleId);
+      if (result){
+        alert("Artigo deletado com sucesso!");
+        navigate(-1);
+      }
+      else{
+        alert("Ocorreu um erro ao deletar o artigo.")
+      }
     }
+
+  
 
     return (
       <div className="manager buttons-ui">
@@ -69,7 +52,7 @@ function ArticlePage(){
           <img className="buttonimg" src={editIcon} />
         </button>
         <button className="transparent btn">
-          <img className="buttonimg trash" onClick={deleteArticle} src={trashIcon} />
+          <img className="buttonimg trash" onClick={handleDelete} src={trashIcon} />
         </button>
       </div>
     );

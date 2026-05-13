@@ -15,7 +15,7 @@ function Header() {
           <img id="header_logo" src={dkLogo} />
         </button>
         <div>
-          <h1 id="header_title" className='fontcinzel'>WikiDK</h1>
+          <h1 id="header_title" className='fontcinzel'>DK Codex</h1>
           <p className='fontinter header_subtitle'>Central de guias, recursos e regras para o clan de swordplay</p>
         </div>
         <AuthCornerButtons/>

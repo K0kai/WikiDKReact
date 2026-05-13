@@ -38,6 +38,7 @@ type ArticleContextType = {
     refresh: () => Promise<void>;
     setFilter: (filter: ArticleFilter) => void;
     createArticle: (formData: ArticleFormData) => Promise<void>;
+    deleteArticle:(id: number) => Promise<boolean>;
     groupArticle: (articleId: number, groupId: number) => Promise<boolean>
     ungroupArticle: (articleId: number, groupId: number) => Promise<boolean>
     //updateArticle(title: string, content: string, thumbnailLink: string): () => Promise<void>;
@@ -66,7 +67,7 @@ export function ArticleProvider({ children }: { children: ReactNode }) {
 
     async function fetchArticles() {
         try {
-            var resp = await fetch(`http://localhost:5119/articles/get`, {
+            var resp = await fetch(`${API_URL}/articles/get`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -86,7 +87,7 @@ export function ArticleProvider({ children }: { children: ReactNode }) {
 
     async function createArticle(formData: ArticleFormData) {
         try {
-            var resp = await fetch(`http://localhost:5119/articles/publish`, {
+            var resp = await fetch(`${API_URL}/articles/publish`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -103,6 +104,21 @@ export function ArticleProvider({ children }: { children: ReactNode }) {
         }
 
 
+    }
+
+    async function deleteArticle(id : number) {     
+        const token = localStorage.getItem("token");
+        if (!token) {
+          alert("Unauthorized action");
+          return false;
+        }
+        var resp = await fetch(`${API_URL}/articles/delete/${id}`, {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        return(resp.ok)
     }
 
     async function groupArticle(articleId: number, groupId: number) {
@@ -166,6 +182,6 @@ export function ArticleProvider({ children }: { children: ReactNode }) {
         fetchArticleGroups();
     }
 
-    return (<ArticleContext.Provider value={{ articles, articleGroups,articleGroupItems, currentFilter, refresh, setFilter, createArticle, groupArticle, ungroupArticle }}>{children}</ArticleContext.Provider>)
+    return (<ArticleContext.Provider value={{ articles, articleGroups,articleGroupItems, currentFilter, refresh, setFilter, createArticle, deleteArticle, groupArticle, ungroupArticle }}>{children}</ArticleContext.Provider>)
 
 }
