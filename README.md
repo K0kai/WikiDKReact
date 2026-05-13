@@ -170,7 +170,7 @@ This project was built to:
 
 ## 📄 License
 
-MIT License
+Proprietary License (All Rights Reserved)
 
 ---
 
