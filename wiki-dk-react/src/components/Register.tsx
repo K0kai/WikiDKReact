@@ -1,6 +1,8 @@
 import { useNavigate } from 'react-router-dom';
 import './Register.css'
 
+const API_URL = import.meta.env.VITE_API_URL
+
 function checkPasswordMatch(password: string, confirmPassword: string): boolean {
     return password === confirmPassword;
 }
@@ -16,7 +18,7 @@ function validatePassword(password: string): boolean {
     return hasUpperCase && hasLowerCase && hasNumber && password.length >= minLength;
 }
 async function makeRegisterRequest(name: string, email: string, password: string): Promise<Response> {
-    return fetch('http://localhost:5119/users/register', {
+    return fetch(`${API_URL}/users/register`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
