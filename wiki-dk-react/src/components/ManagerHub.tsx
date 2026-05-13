@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { AuthContext } from "../AuthContext";
+import { AuthContext } from "../context/AuthContext";
 import { CategoryContext } from "../context/CategoryContext";
 import "./ManagerHub.css";
 import "./reusable/Modal.css"

@@ -1,23 +1,18 @@
-import { useState, useContext, useEffect } from "react";
+import { useState, useContext } from "react";
 import { CategoryContext } from "../context/CategoryContext";
 import { useNavigate } from "react-router-dom";
 import type { Article } from "../types/article";
 import type { Category } from "../types/category";
 import './ArticlesPage.css';
-import star from "../assets/star-xxl.png"
-import crossedStar from "../assets/crossed_star.png"
 import plus from "../assets/plus.png"
 import { ArticleContext, type CategoryFilter } from "../context/ArticleContext";
 import plusCalendarIcon from "../assets/calendar_plus_icon.png"
 import clockCalendarIcon from "../assets/clock-date-calendar-icon.png"
 
-const API_URL = import.meta.env.VITE_API_URL;
-
 
 
 function ArticleCard({ article }: { article: Article }) {
     const navigate = useNavigate();
-    const artContext = useContext(ArticleContext);
 
     return (
         <div key={article.id} className="article-card">
@@ -199,23 +194,6 @@ function CategoryBox({ category, isChecked }: { category: Category, isChecked: (
 
     } catch (err) {
         console.error(err)
-    }
-}
-
-function HighlightPostButton({isHighlight, onHighlight, onUnhighlight }: {isHighlight : boolean, onHighlight: () => void , onUnhighlight: () => void}) {
-    if (isHighlight){
-    return <>
-        <button onClick={onHighlight} title="Destacar" className="pthover tallbutton highlightstar nobg noborder">
-            <img className="smallicon yellowtint" src={star} />
-        </button>
-    </>
-    }
-    else{
-        return <>
-        <button onClick={onUnhighlight} title="Tirar destaque" className="pthover tallbutton nobg noborder">
-            <img className="slightlymediumicon unhighlightstar redtint" src={crossedStar} />
-        </button>
-        </>
     }
 }
 

@@ -10,6 +10,8 @@ type CategoryContextType = {
     updateCategory: (id: number, name: string, description: string, slug: string, icon: string) => Promise<void>
 };
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export const CategoryContext = createContext<CategoryContextType | null>(null);
 
 export function CategoryProvider({ children }: { children: React.ReactNode }) {
@@ -17,7 +19,7 @@ export function CategoryProvider({ children }: { children: React.ReactNode }) {
 
     async function fetchCategories(): Promise<Category[] | undefined> {
         try {
-            const resp = await fetch("http://localhost:5119/categories");
+            const resp = await fetch(`${API_URL}/categories`);
             if (!resp.ok) throw new Error("Failed to fetch categories");
 
             return await resp.json();
@@ -36,7 +38,7 @@ export function CategoryProvider({ children }: { children: React.ReactNode }) {
     }, []);
 
     const createCategory = async (name: string, description: string, icon: string | null) => {
-        const resp = await fetch("http://localhost:5119/categories", {
+        const resp = await fetch(`${API_URL}/categories`, {
             method: "POST",
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -52,7 +54,7 @@ export function CategoryProvider({ children }: { children: React.ReactNode }) {
     };
 
     const deleteCategory = async (id: number) => {
-        var resp = await fetch(`http://localhost:5119/categories/delete/${id}`, {
+        var resp = await fetch(`${API_URL}/categories/delete/${id}`, {
             method: "DELETE",
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -66,7 +68,7 @@ export function CategoryProvider({ children }: { children: React.ReactNode }) {
     };
 
     const updateCategory = async (id: number, name: string, description: string, slug: string, icon: string) => {
-        var resp = await fetch(`http://localhost:5119/categories/update/${id}`, {
+        var resp = await fetch(`${API_URL}/categories/update/${id}`, {
             method: "PUT",
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("token")}`,

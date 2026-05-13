@@ -1,5 +1,5 @@
 import { useContext, useState } from "react";
-import { AuthContext } from "../../AuthContext";
+import { AuthContext } from "../../context/AuthContext";
 import ArticleForm, { type ArticleFormData } from "./ArticleForm";
 import { ArticleContext } from "../../context/ArticleContext";
 import { useNavigate } from "react-router-dom";

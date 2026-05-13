@@ -1,4 +1,4 @@
-import { AuthContext } from "../AuthContext";
+import { AuthContext } from "../context/AuthContext";
 import { useState, useContext, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import './ArticlePage.css';

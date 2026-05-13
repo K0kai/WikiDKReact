@@ -1,7 +1,7 @@
 import './Sidebar.css';
 import { useNavigate } from 'react-router-dom';
 import { useContext, useEffect, useState } from 'react';
-import { AuthContext } from '../AuthContext';
+import { AuthContext } from '../context/AuthContext';
 import shield from "../assets/shield.png"
 import { ArticleContext } from '../context/ArticleContext';
 import type { ArticleGroup } from '../types/articleGroup';

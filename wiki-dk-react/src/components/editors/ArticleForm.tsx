@@ -1,5 +1,5 @@
 import { useState, useContext, useEffect } from "react";
-import { AuthContext } from "../../AuthContext";
+import { AuthContext } from "../../context/AuthContext";
 import type { CategoryFilter } from "../../context/ArticleContext";
 import { CategoryContext } from "../../context/CategoryContext";
 import type { Article } from "../../types/article";

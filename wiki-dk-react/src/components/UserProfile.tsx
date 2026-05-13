@@ -1,5 +1,5 @@
 import React, { useContext, useRef, useState } from "react";
-import { AuthContext } from "../AuthContext";
+import { AuthContext } from "../context/AuthContext";
 import "./UserProfile.css"
 import upload from "../assets/uploadsymbol.png"
 import slashuser from "../assets/slashedusericon.png"
