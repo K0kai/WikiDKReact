@@ -89,11 +89,11 @@ function FiltersPanel({ }) {
     return <div className="flex gap40">
         <CategoryFilterBoxes
             onCheckedFiltersChanged={() => null} />
-        <DateFilterButtons onDateFilterChanged={() => null} />
+        <DateFilterButtons />
     </div>
 }
 
-function DateFilterButtons({ onDateFilterChanged }: { onDateFilterChanged: () => void }) {
+function DateFilterButtons({}) {
     try {
         return <div className="date-radio-buttons flex column">
             <h3>Data:</h3>
@@ -133,6 +133,7 @@ function CategoryFilterBoxes({ onCheckedFiltersChanged }: { onCheckedFiltersChan
         if (!catContext)
             throw new Error("Category context can't be null");
         const categories = catContext.categories
+        filters;
 
         function handleFilterChange(filter: CategoryFilter) {
             setFilters(prev => {

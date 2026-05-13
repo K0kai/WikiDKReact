@@ -6,17 +6,20 @@ import { AuthProvider } from './context/AuthContext.tsx'
 import { CategoryProvider } from './context/CategoryContext.tsx'
 import { ArticleProvider } from './context/ArticleContext.tsx'
 import { ArticleGroupProvider } from './context/ArticleGroupContext.tsx'
+import { BrowserRouter } from 'react-router-dom'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <AuthProvider>
-      <ArticleProvider>
-        <ArticleGroupProvider>
-          <CategoryProvider>
-            <App />
-          </CategoryProvider>
-        </ArticleGroupProvider>
-      </ArticleProvider>
-    </AuthProvider>
+    <BrowserRouter>
+      <AuthProvider>
+        <ArticleProvider>
+          <ArticleGroupProvider>
+            <CategoryProvider>
+              <App />
+            </CategoryProvider>
+          </ArticleGroupProvider>
+        </ArticleProvider>
+      </AuthProvider>
+    </BrowserRouter>
   </StrictMode>,
 )

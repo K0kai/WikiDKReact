@@ -121,7 +121,7 @@ export function ArticleProvider({ children }: { children: ReactNode }) {
         return(resp.ok)
     }
 
-    async function groupArticle(articleId: number, groupId: number) {
+    async function groupArticle(articleId: number) {
         var resp = await fetch(`${API_URL}/articles/highlight/${articleId}`, 
             {method:"POST",
             headers:{

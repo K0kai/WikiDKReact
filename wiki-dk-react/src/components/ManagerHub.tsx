@@ -115,120 +115,6 @@ function ViewCategory({ category, onOpenEditModal }: { category: Category, onOpe
 
 
 
-/* ---------------- MODAL ---------------- */
-
-function OpenEditCategoryModal({
-    isOpen,
-    onClose,
-    category
-}: {
-    isOpen: boolean,
-    onClose: () => void;
-    category: Category
-}) {
-    if (!isOpen) return null;
-
-    let name = category.name;
-    let description = category.description;
-    const [icon, setIcon] = useState<string>(category.icon);
-    const catContext = useContext(CategoryContext);
-
-    const handleUpdate = () => {
-        catContext?.updateCategory(category.id, name, description, category.slug, icon)
-        onClose();
-    }
-
-    return (
-        <div className="overlay" onClick={onClose}>
-            <div className="modal" onClick={(e) => e.stopPropagation()}>
-                <h2>{`Editar ${category.name}`} </h2>
-
-                <div className="flex flex-direction-column align-center gap20">
-                    <input
-                        className="nooutline"
-                        placeholder="Nome"
-                        defaultValue={name}
-                        onChange={(e) => (name = e.target.value)}
-                    />
-                    <input
-                        className="nooutline"
-                        placeholder="Descrição"
-                        defaultValue={description}
-                        onChange={(e) => (description = e.target.value)}
-                    />
-                    <input
-                        className="nooutline"
-                        placeholder="Link"
-                        defaultValue={icon}
-                        onChange={(e) => (setIcon(e.target.value))}
-                    />
-                    <p>Preview do icone:</p>
-                    <img className="mediumicon test" src={icon} />
-                </div>
-
-                <div className="flex flex-direction-column gap40 margin-top30">
-                    <button onClick={() => handleUpdate()}>
-                        Atualizar
-                    </button>
-                    <button onClick={onClose}>Fechar</button>
-                </div>
-            </div>
-        </div>
-    );
-
-
-}
-
-function OpenCategoryModal({
-    isOpen,
-    onClose,
-}: {
-    isOpen: boolean;
-    onClose: () => void;
-}) {
-    const catContext = useContext(CategoryContext);
-    if (!catContext)
-        throw new Error("Category context cant be null");
-
-
-    if (!isOpen) return null;
-
-    let name = "";
-    let description = "";
-
-    const handleCreate = () => {
-        catContext.createCategory(name, description, null);
-        onClose();
-    }
-
-    return (
-        <div className="overlay" onClick={onClose}>
-            <div className="modal" onClick={(e) => e.stopPropagation()}>
-                <h2>Nova Categoria</h2>
-
-                <div className="flex flex-direction-column gap20">
-                    <input
-                        className="nooutline"
-                        placeholder="Nome"
-                        onChange={(e) => (name = e.target.value)}
-                    />
-                    <input
-                        className="nooutline"
-                        placeholder="Descrição"
-                        onChange={(e) => (description = e.target.value)}
-                    />
-                </div>
-
-                <div className="flex flex-direction-column gap40 margin-top30">
-                    <button onClick={() => handleCreate()}>
-                        Criar
-                    </button>
-                    <button onClick={onClose}>Fechar</button>
-                </div>
-            </div>
-        </div>
-    );
-}
 
 /* ---------------- DROPDOWN ---------------- */
 
@@ -274,7 +160,6 @@ export default function ManagerHub() {
 
     const [isPermitted, setIsPermitted] = useState(false);
     const [modalState, setModalState] = useState<ModalState>({ type: null, mode: "", payload: null })
-    const [editingCategory, setEditingCategory] = useState<Category | null>(null)
 
     const catContext = useContext(CategoryContext);
     const articleGroupContext = useContext(ArticleGroupContext);

@@ -59,6 +59,7 @@ function CategoryCheckBoxes({ article, onCheckedFiltersChanged }: { article: Art
         if (!catContext)
             throw new Error("Category context can't be null");
         const categories = catContext.categories
+        filters;
 
         function handleFilterChange(filter: CategoryFilter) {
             setFilters(prev => {
