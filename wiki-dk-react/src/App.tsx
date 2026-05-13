@@ -2,7 +2,7 @@
 import { Routes, Route } from 'react-router-dom'
 import './App.css'
 import Header from './components/Header'
-import Register from './components/Register'
+import Register from "./components/Register"
 import Login from './components/Login'
 import Sidebar from './components/Sidebar'
 import Home from "./components/Home"

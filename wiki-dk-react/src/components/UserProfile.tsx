@@ -1,4 +1,4 @@
-import React, { useContext, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
 import "./UserProfile.css"
 import upload from "../assets/uploadsymbol.png"
@@ -13,25 +13,36 @@ const API_URL = import.meta.env.VITE_API_URL
 
 function UserProfile() {
     const authContext = useContext(AuthContext)
+
     if (!authContext)
         throw new Error("Auth context can't be null");
 
-    if (!authContext.isAuthenticated)
-        return <p>Unauthorized</p>
-
-    const [imgPreview, setImgPreview] = useState<string>(`${authContext.user?.userIcon}`)
-    const [imgFile, setImgFile] = useState<File | null>()
+    
+   const [imgPreview, setImgPreview] = useState<string>(`${authContext.user?.userIcon}`)
+    const [imgFile, setImgFile] = useState<File | null>(null)
     const [defaultIcon, setDefaultIcon] = useState<string>("")
     const [isEditing, toggleEditingStatus] = useState<boolean>(false)
-    const [userData, setUserData] = useState<EditableUserData>({ name: authContext.user?.name ?? "", email: authContext.user?.email ?? "" })
+    const [userData, setUserData] = useState<EditableUserData>({
+        name: authContext.user?.name ?? "",
+        email: authContext.user?.email ?? ""
+    })
 
-    useState(() => {
+     useState(() => {
         async function getDefIcon() {
             var icon = await (await fetch(`${API_URL}/users/default/icon`)).text();
             setDefaultIcon(icon);
         }
         getDefIcon();
     })
+
+    useEffect(() => {
+        setImgPreview(authContext.user?.userIcon ?? "")
+        setUserData({name: authContext?.user?.name ?? "", email: authContext.user?.email ?? ""})
+    },[authContext.user])
+
+    if (!authContext.isAuthenticated)
+        return <p>Unauthorized</p>
+
 
     async function handleEditSubmit() {
         await fetch(`${API_URL}/users/edit/me`, {
@@ -50,13 +61,15 @@ function UserProfile() {
             formData.append("imgFile", imgFile);
             formData.append("upload_preset", "wikidk");
 
-            await fetch(`${API_URL}/users/upload/icon`, {
+            var resp = await fetch(`${API_URL}/users/upload/icon`, {
                 method: "POST",
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem("token")}`,
                 },
                 body: formData
             })
+            console.log(resp.status)
+            console.log(resp.statusText);
         }
         authContext?.refreshUser();
 
