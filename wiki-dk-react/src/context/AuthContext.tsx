@@ -25,9 +25,9 @@ export const AuthContext = createContext<AuthContextType | undefined>(undefined)
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(!!user);
-  const token = localStorage.getItem("token");
 
   function checkAuthentication() {
+    var token = localStorage.getItem("token");
     
     if (!token) {
       setUser(null);
@@ -58,6 +58,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   async function refreshUser(){
+    var token = localStorage.getItem("token");
+
     var fetchUser =  await fetch(`${API_URL}/users/get/me`, {
       method: "GET",
       headers: {

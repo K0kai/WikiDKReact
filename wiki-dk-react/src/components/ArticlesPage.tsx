@@ -49,7 +49,6 @@ function ArticlesPage() {
 
     useEffect(() => {
         artContext.setFilter(filter)
-        console.log(filter);
     },[filter])
 
     return (
