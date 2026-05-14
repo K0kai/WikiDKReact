@@ -1,40 +1,47 @@
 import { useContext, useState } from "react";
-import { CategoryContext } from "../../context/CategoryContext";
-import type { Category } from "../../types/category";
+import { RanksContext, type Rank } from "../../context/RankContext";
 
 
-function CategoryForm({ category, mode, onClose }: {category: Category, mode: string, onClose:() => void}) {
-    const catContext = useContext(CategoryContext);
+function RankForm({ rank, mode, onClose }: {rank: Rank, mode: string, onClose:() => void}) {
+    const rankContext = useContext(RanksContext);
 
-    const [name, setName] = useState<string>(category?.name || "");
-    const [description, setDescription] = useState<string>(category?.description || "");
-    const [icon, setIcon] = useState<string>(category?.icon || "");
+    const [name, setName] = useState<string>(rank?.name || "");
+    const [description, setDescription] = useState<string>(rank?.description || "");
+    const [image, setImage] = useState<File | null>(null);
+    const [preview, setPreview] = useState<string>(rank?.icon || "");
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0] || null;
+        setImage(file);
+
+        if (file) {
+            setPreview(URL.createObjectURL(file));
+        }
+    };
 
     const handleSubmit = () => {
-        if (!catContext) return;
+        if (!rankContext) return;
 
         switch (mode) {
             case "update":
-                catContext.updateCategory(
-                    category.id,
-                    name,
-                    description,
-                    category.slug,
-                    icon
-                );
+                if (!rank) return;
+
                 break;
 
             case "create":
-                catContext.createCategory(name, description, icon);
+                rankContext.createRank({ name: name, description: description, image: image });
                 break;
         }
 
         onClose();
     };
 
+
+
+
     return (
         <div>
-            <h2>Categoria</h2>
+            <h2>Rank</h2>
 
             <div className="flex flex-direction-column align-center gap20">
                 <input
@@ -52,14 +59,15 @@ function CategoryForm({ category, mode, onClose }: {category: Category, mode: st
                 />
 
                 <input
+                    type="file"
+                    accept="image/*"
                     className="nooutline"
-                    placeholder="Link"
-                    value={icon}
-                    onChange={(e) => setIcon(e.target.value)}
+                    onChange={handleFileChange}
                 />
 
                 <p>Preview do ícone:</p>
-                {icon && <img className="mediumicon test" src={icon} alt="preview" />}
+                {preview && <img className="mediumicon" src={preview} alt="preview" />}
+                
             </div>
 
             <div className="flex flex-direction-column gap40 margin-top30">
@@ -75,4 +83,4 @@ function CategoryForm({ category, mode, onClose }: {category: Category, mode: st
     );
 }
 
-export default CategoryForm;
+export default RankForm;

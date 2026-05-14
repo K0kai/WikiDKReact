@@ -16,6 +16,8 @@ import Modal from "./reusable/Modal";
 import CategoryForm from "./reusable/CategoryForm";
 import GroupForm from "./reusable/GroupForm";
 import { ArticleGroupContext } from "../context/ArticleGroupContext";
+import { RanksContext, type Rank } from "../context/RankContext";
+import RankForm from "./reusable/RankForm";
 
 /* ---------------- GLOBALS ---------------- */
 
@@ -37,6 +39,35 @@ type ModalState = {
 
 
 /* ---------------- UI HELPERS ---------------- */
+
+function ViewRank({rank, onOpenEditModal}: {rank : Rank, onOpenEditModal:(rank: Rank) => void}){
+    const rankContext = useContext(RanksContext)
+    if (!rankContext)
+        throw new Error("Rank context can't be null");
+
+    return (
+        <div
+            key={rank.id}
+            className="flex side-by-side justify-content-center margin-down20 category-ctr"
+        >
+            <button className="nobg noborder pthover category-edit">
+                <img className="smallicon" onClick={() => onOpenEditModal(rank)} src={editIcon} />
+            </button>
+
+            <button className="nobg noborder pthover category-delete">
+                <img className="redtint smallicon" onClick={() => null} src={trashIcon} />
+            </button>
+
+            <div className="margin-left15">
+                <div className="flex side-by-side">
+                    <img className="mediumicon margin-right15" src={rank.icon} />
+                    <p className="fontinter blackfont">{rank.name}</p>
+                </div>
+                <p className="fontsmall fontinter blackfont">{rank.description || ""}</p>
+            </div>
+        </div>
+    );
+}
 
 function ViewGroup({ group, onOpenEditModal }: { group: ArticleGroup, onOpenEditModal: (group: ArticleGroup) => void }) {
     const articleContext = useContext(ArticleContext);
@@ -163,10 +194,13 @@ export default function ManagerHub() {
 
     const catContext = useContext(CategoryContext);
     const articleGroupContext = useContext(ArticleGroupContext);
+    const rankContext = useContext(RanksContext);
     if (!catContext)
         throw new Error("Category Context cant be null");
     if (!articleGroupContext)
         throw new Error("Article context can't be null");
+    if (!rankContext)
+        throw new Error("Rank context can't be null");
 
     const categories = catContext.categories
     const articleGroups = articleGroupContext.groups
@@ -186,6 +220,9 @@ export default function ManagerHub() {
             {modalState.type == "group" ? (<>
                 <Modal children={<GroupForm group={modalState.payload} onClose={() => setModalState({ type: null, mode: "", payload: null })} mode={modalState.mode} />} onClose={() => { setModalState({ type: null, mode: "", payload: null }) }} />
             </>) : (<></>)}
+            {modalState.type == "rank" ? (<>
+                <Modal children={<RankForm rank={modalState.payload} onClose={() => setModalState({ type: null, mode: "", payload: null })} mode={modalState.mode} />} onClose={() => { setModalState({ type: null, mode: "", payload: null }) }} />
+            </>) : (<></>)}
             <div className="dropdowns-container">
 
                 <Dropdown
@@ -204,6 +241,14 @@ export default function ManagerHub() {
                         setModalState({ type: "group", mode: "update", payload: group });
                     }}
                     children={articleGroups.map(artG => <ViewGroup key={artG.id} group={artG} onOpenEditModal={(artG) => setModalState({ type: "group", mode: "update", payload: artG })} />)}
+                />
+                <Dropdown
+                    name="Patentes"
+                    onOpenModal={() => setModalState({ type: "rank", mode: "create", payload: null })}
+                    onOpenEditModal={(group) => {
+                        setModalState({ type: "rank", mode: "update", payload: group });
+                    }}
+                    children={rankContext.ranks.map(rank => <ViewRank key={rank.id} rank={rank} onOpenEditModal={(rank) => setModalState({ type: "rank", mode: "update", payload: rank })} />)}
                 />
             </div>
         </>
