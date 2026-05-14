@@ -40,7 +40,8 @@ function AppLoader({ children }: { children: React.ReactNode }) {
 
     if (!isReady) {
         return (
-            <div className="th-loader">
+            <div className="th-loader flex column">
+                <img src="https://raw.githubusercontent.com/n3r4zzurr0/svg-spinners/main/preview/ring-resize-white-36.svg"/>
                 {!isWakingUp ? (
                     <p>Carregando...</p>
                 ) : (
