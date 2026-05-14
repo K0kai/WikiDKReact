@@ -1,11 +1,10 @@
 import { AuthContext } from "../context/AuthContext";
-import { useState, useContext, useEffect } from "react";
+import { useContext, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import './ArticlePage.css';
 import ReactMarkdown from "react-markdown";
 import editIcon from "../assets/edit-icon.png"
 import trashIcon from "../assets/trash-icon.png"
-import type { Article } from "../types/article";
 import remarkGfm from "remark-gfm";
 import { ArticleContext } from "../context/ArticleContext";
 
@@ -13,24 +12,24 @@ import { ArticleContext } from "../context/ArticleContext";
 
 
 
-function ArticlePage(){
+function ArticlePage() {
   const articleContext = useContext(ArticleContext);
-   const { id } = useParams<{ id: string }>();
-    const articleId = parseInt(id || '0');
-    const [article, setArticle] = useState<Article | null>(articleContext?.articles[articleId] ?? null);
+  const { id } = useParams<{ id: string }>();
+  const articleId = parseInt(id || '0');
+  const article = articleContext?.articles[articleId];
+  articleContext?.getArticle(articleId)
 
-    useEffect(() => {
-      setArticle(articleContext?.articles[articleId] ?? null)
+  useEffect(() => {
 
-    },[id])
-   
+  }, [id, article])
+
 
   function ManageButtons() {
     const navigate = useNavigate();
     var authContext = useContext(AuthContext);
     if (!authContext?.hasRole(1)) return null;
 
-    async function handleDelete(){
+    async function handleDelete() {
       var con = confirm("Essa ação é irreversível, deseja prosseguir?")
       if (!con)
         return;

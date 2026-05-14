@@ -35,6 +35,7 @@ type ArticleContextType = {
     currentFilter: ArticleFilter;
     isLoading: boolean;
     refresh: () => Promise<void>;
+    getArticle: (id: number) => Promise<Article | undefined>
     setFilter: (filter: ArticleFilter) => void;
     createArticle: (formData: ArticleFormData) => Promise<void>;
     deleteArticle:(id: number) => Promise<boolean>;   
@@ -136,8 +137,10 @@ export function ArticleProvider({ children }: { children: ReactNode }) {
                 body: JSON.stringify(formData)
             });
 
-            if (resp.ok)
+            if (resp.ok){
                 refresh()
+                articleGroupContext?.refresh();
+            }
             
         } catch (err) {
             console.log(err);
@@ -173,6 +176,6 @@ export function ArticleProvider({ children }: { children: ReactNode }) {
         fetchSearchedArticles();
     }
 
-    return (<ArticleContext.Provider value={{ articles, searchedArticles, currentFilter,isLoading, refresh, setFilter, createArticle, deleteArticle }}>{children}</ArticleContext.Provider>)
+    return (<ArticleContext.Provider value={{ articles, searchedArticles, currentFilter,isLoading, getArticle, refresh, setFilter, createArticle, deleteArticle }}>{children}</ArticleContext.Provider>)
 
 }
