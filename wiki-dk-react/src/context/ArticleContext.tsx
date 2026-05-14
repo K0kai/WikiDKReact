@@ -1,9 +1,8 @@
-import { createContext } from "react";
+import { createContext, useContext } from "react";
 import type { Article } from "../types/article"
 import { useEffect, useState, type ReactNode } from "react";
 import type { ArticleFormData } from "../components/editors/ArticleForm";
-import type { ArticleGroup } from "../types/articleGroup";
-import type { ArticleGroupItem } from "../types/articleGroupItem";
+import { ArticleGroupContext } from "./ArticleGroupContext";
 
 const API_URL = import.meta.env.VITE_API_URL
 
@@ -12,7 +11,7 @@ export type ArticleFilter = {
     page: number;
     pageSize: number;
     dateSortType: DateSortType;
-    categoryFilters: CategoryFilter[]
+    categoryFilters: number[]
 }
 
 export type CategoryFilter = {
@@ -31,16 +30,14 @@ export const DateSortType = {
 export type DateSortType = (typeof DateSortType)[keyof typeof DateSortType];
 
 type ArticleContextType = {
-    articles: Article[];
-    articleGroups: ArticleGroup[];
-    articleGroupItems: ArticleGroupItem[];
+    articles: Record<number,Article>;
+    searchedArticles: Article[];
     currentFilter: ArticleFilter;
+    isLoading: boolean;
     refresh: () => Promise<void>;
     setFilter: (filter: ArticleFilter) => void;
     createArticle: (formData: ArticleFormData) => Promise<void>;
-    deleteArticle:(id: number) => Promise<boolean>;
-    groupArticle: (articleId: number, groupId: number) => Promise<boolean>
-    ungroupArticle: (articleId: number, groupId: number) => Promise<boolean>
+    deleteArticle:(id: number) => Promise<boolean>;   
     //updateArticle(title: string, content: string, thumbnailLink: string): () => Promise<void>;
     //deleteArticle(id: number): () => Promise<void>;
 
@@ -49,9 +46,10 @@ type ArticleContextType = {
 export const ArticleContext = createContext<ArticleContextType | null>(null)
 
 export function ArticleProvider({ children }: { children: ReactNode }) {
-    const [articles, setArticles] = useState<Article[]>([]);
-    const [articleGroups, setArticleGroups] = useState<ArticleGroup[]>([])
-    const [articleGroupItems, setArticleGroupItems] = useState<ArticleGroupItem[]>([])
+    const articleGroupContext = useContext(ArticleGroupContext)
+    const [articles, setArticles] = useState<Record<number,Article>>({});
+    const pendingArticles : Record<number, Promise<Article>> = {};
+    const [searchedArticles, setSearchedArticles] = useState<Article[]>([])
     const [currentFilter, setCurrentFilter] = useState<ArticleFilter>(
         {
             page: 1,
@@ -60,12 +58,50 @@ export function ArticleProvider({ children }: { children: ReactNode }) {
             categoryFilters: []
         }
     )
+    const [isLoading, setIsLoading] = useState<boolean>(true);
 
     useEffect(() => {
         refresh();
     }, []);
 
-    async function fetchArticles() {
+    useEffect(() => {
+        fetchSearchedArticles();
+    }, [currentFilter])
+
+    useEffect(() => {
+        if (articleGroupContext){
+        for (var gI of articleGroupContext.groupItems){
+            getArticle(gI.articleId)
+        }
+    }
+    },[articleGroupContext, articleGroupContext?.groupItems])
+
+    async function fetchArticle(id: number){
+        var resp = await fetch(`${API_URL}/articles/get/${id}`)
+        var data: Article = await resp.json();        
+        return data;
+    }
+
+    async function getArticle(id : number){
+        try{
+            if (articles[id])
+                return articles[id]
+            if (await pendingArticles[id])
+                return pendingArticles[id];
+
+            pendingArticles[id] = fetchArticle(id).then(a => {
+                setArticles(prev => ({...prev, [id]:a}))
+                delete pendingArticles[id]
+                return a;
+            })
+
+        }
+        catch(Err){
+            console.error(Err);
+        }
+    }
+
+    async function fetchSearchedArticles() {
         try {
             var resp = await fetch(`${API_URL}/articles/get`, {
                 method: "POST",
@@ -76,11 +112,15 @@ export function ArticleProvider({ children }: { children: ReactNode }) {
             })
             if (resp.body && resp.ok) {
                 var data = await resp.json();
-                setArticles(data);
+                setSearchedArticles(data);
             }
+            setIsLoading(!resp.ok)
+            return false;
         }
         catch (err) {
             console.error(err);
+            setIsLoading(true);
+            return true;
         }
 
     }
@@ -119,69 +159,20 @@ export function ArticleProvider({ children }: { children: ReactNode }) {
           },
         });
         return(resp.ok)
-    }
-
-    async function groupArticle(articleId: number) {
-        var resp = await fetch(`${API_URL}/articles/highlight/${articleId}`, 
-            {method:"POST",
-            headers:{
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
-                "Content-Type":"application/json"
-            }
-
-            },
-        )
-        var data : ArticleGroupItem = await resp.json();
-        if (resp.ok) {
-            setArticleGroupItems([...articleGroupItems, data])
-            return true
-        }
-        else
-            return false
-    }
-
-    async function ungroupArticle(articleId: number, groupId: number){
-         var resp = await fetch(`${API_URL}/articles/unhighlight/${articleId}`, 
-            {method:"POST",
-            headers:{
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
-                "Content-Type":"application/json"
-            }
-
-            },
-        )
-
-        if (resp.ok) {
-            var newArray = articleGroupItems.filter(hArt => hArt.articleId != articleId && hArt.articleGroupId != groupId)
-            setArticleGroupItems(newArray);
-            return true
-        }
-        else
-            return false
-    }
+    }  
         
     
 
-    async function fetchArticleGroups(){
-        var resp = await fetch (`${API_URL}/articles/groups`)
-        if (resp.ok){
-            var data : ArticleGroup[] = await resp.json();
-            setArticleGroups(data)
-        }
-        else{
-            console.error(`Failed to fetch highlights: ${resp.status} ${resp.statusText}`)
-        }
-    }
+
 
     function setFilter(filter: ArticleFilter) {
         setCurrentFilter(filter);
     }
 
     async function refresh() {
-        fetchArticles();
-        fetchArticleGroups();
+        fetchSearchedArticles();
     }
 
-    return (<ArticleContext.Provider value={{ articles, articleGroups,articleGroupItems, currentFilter, refresh, setFilter, createArticle, deleteArticle, groupArticle, ungroupArticle }}>{children}</ArticleContext.Provider>)
+    return (<ArticleContext.Provider value={{ articles, searchedArticles, currentFilter,isLoading, refresh, setFilter, createArticle, deleteArticle }}>{children}</ArticleContext.Provider>)
 
 }

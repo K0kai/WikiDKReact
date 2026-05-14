@@ -7,18 +7,21 @@ import { CategoryProvider } from './context/CategoryContext.tsx'
 import { ArticleProvider } from './context/ArticleContext.tsx'
 import { ArticleGroupProvider } from './context/ArticleGroupContext.tsx'
 import { BrowserRouter } from 'react-router-dom'
+import { OtherUserProvider } from './context/OtherUserContext.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter>
       <AuthProvider>
-        <ArticleProvider>
-          <ArticleGroupProvider>
+        <ArticleGroupProvider>
+          <ArticleProvider>
             <CategoryProvider>
-              <App />
+              <OtherUserProvider>
+                <App />
+              </OtherUserProvider>
             </CategoryProvider>
-          </ArticleGroupProvider>
-        </ArticleProvider>
+          </ArticleProvider>
+        </ArticleGroupProvider>
       </AuthProvider>
     </BrowserRouter>
   </StrictMode>,

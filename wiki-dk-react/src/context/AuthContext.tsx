@@ -8,6 +8,7 @@ type User = {
   email: string
   role: number
   userIcon: string
+  ranks: number[]
 }
 
 type AuthContextType = {
