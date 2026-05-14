@@ -10,7 +10,7 @@ function AuthCornerButtons()
     throw new Error("AuthCornerButtons must be used within an AuthProvider");
   }
 
-  const { isAuthenticated } = authContext;
+  const isAuthenticated  = authContext.isAuthenticated;
  
   const navigate = useNavigate();
   

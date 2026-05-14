@@ -17,10 +17,10 @@ function ArticlePage(){
   const articleContext = useContext(ArticleContext);
    const { id } = useParams<{ id: string }>();
     const articleId = parseInt(id || '0');
-    const [article, setArticle] = useState<Article | null>(articleContext?.articles.filter(a => a.id == articleId)[0] ?? null);
+    const [article, setArticle] = useState<Article | null>(articleContext?.articles[articleId] ?? null);
 
     useEffect(() => {
-      setArticle(articleContext?.articles.filter(a => a.id == articleId)[0] ?? null)
+      setArticle(articleContext?.articles[articleId] ?? null)
 
     },[id])
    

@@ -4,23 +4,67 @@ import type { ArticleGroup } from "../types/articleGroup";
 import banner from "../assets/dkbanner.png";
 import "./Home.css";
 import { ArticleGroupContext } from "../context/ArticleGroupContext";
+import { useNavigate } from "react-router-dom";
+import { OtherUserContext } from "../context/OtherUserContext";
+import type { Article } from "../types/article";
+
+function ArticleCard({ article }: { article: Article }) {
+  const otherUserContext = useContext(OtherUserContext);
+
+  if (!otherUserContext)
+    return <img className="mediumicon" src="https://raw.githubusercontent.com/n3r4zzurr0/svg-spinners/main/preview/ring-resize-white-36.svg" />;
+
+  otherUserContext.getUser(article.authorId);
+  otherUserContext.getUser(article.lastEditorId);
+
+  const { users } = otherUserContext;
+  const navigate = useNavigate();
+  return <div onClick={() => navigate(`article/${article.id}`)} key={article.id} className="home-article-card">
+    {article.thumbnailLink && (
+      <img className="home-article-thumb" src={article.thumbnailLink} alt="" />
+    )}
+    <div className="home-article-info">
+      <div className="home-article-title">{article.title}</div>
+      <div className="home-article-meta">
+        <div>
+          <div className="flex side-by-side align-center">
+            Autor:
+            <img className="margin-left5 margin-right5 smallicon circular" src={users[article.authorId]?.userIcon ?? "https://cdn-icons-png.flaticon.com/512/149/149071.png"} />
+            {users[article.authorId]?.name ?? "Desconhecido"}
+          </div>
+          <div className="flex side-by-side align-center">
+            Ultimo editor:
+            <img className="margin-left5 margin-right5 smallicon circular" src={users[article.lastEditorId]?.userIcon ?? "https://cdn-icons-png.flaticon.com/512/149/149071.png"} />
+            {users[article.lastEditorId]?.name ?? "Desconhecido"}
+          </div>
+          Atualizado em: {new Date(article.updated).toLocaleDateString()}
+        </div>
+
+      </div>
+    </div>
+  </div>
+}
 
 function Home() {
   const articleContext = useContext(ArticleContext);
   const articleGroupContext = useContext(ArticleGroupContext);
   const [selectedGroup, setSelectedGroup] = useState<ArticleGroup | null>(null);
 
-  if (!articleContext)
-    return <img className="mediumicon" src="https://raw.githubusercontent.com/n3r4zzurr0/svg-spinners/main/preview/ring-resize-white-36.svg" />;
-
+  if (!articleContext || !articleGroupContext) {
+    return <div>Error: context missing</div>;
+  }
+  if (articleContext.isLoading)
+    return <div className="margin-left15 th-loader">
+      <img className="" src="https://raw.githubusercontent.com/n3r4zzurr0/svg-spinners/main/preview/ring-resize-white-36.svg" />
+    </div>
   const { articles } = articleContext;
   const homeGroups = articleGroupContext?.groups.filter((g) => g.displayOnHome);
+  const articleKeys = Object.keys(articles).map(Number);
 
   const groupArticles = selectedGroup
-    ? articleGroupContext?.groupItems
-        .filter((i) => i.articleGroupId === selectedGroup.id)
-        .map((i) => articles.find((a) => a.id === i.articleId))
-        .filter(Boolean)
+    ? articleGroupContext.groupItems
+      .filter((i) => i.articleGroupId === selectedGroup.id)
+      .filter((i) => articleKeys.includes(i.articleId))
     : [];
 
   return (
@@ -39,20 +83,10 @@ function Home() {
             )}
             <div className="home-articles-list">
               {groupArticles?.length === 0 && (
-                <p className="home-empty">No articles in this group yet.</p>
+                <p className="home-empty">Sem artigos neste grupo ainda.</p>
               )}
-              {groupArticles?.map((article) => article && (
-                <div key={article.id} className="home-article-card">
-                  {article.thumbnailLink && (
-                    <img className="home-article-thumb" src={article.thumbnailLink} alt="" />
-                  )}
-                  <div className="home-article-info">
-                    <div className="home-article-title">{article.title}</div>
-                    <div className="home-article-meta">
-                      Atualizado em: {new Date(article.updated).toLocaleDateString()}
-                    </div>
-                  </div>
-                </div>
+              {groupArticles?.map((articleGroupItem) => articleGroupItem && (
+                <ArticleCard key={articleGroupItem.id} article={articles[articleGroupItem.articleId]} />
               ))}
             </div>
           </>

@@ -1,11 +1,11 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { CategoryContext } from "../context/CategoryContext";
 import { useNavigate } from "react-router-dom";
 import type { Article } from "../types/article";
 import type { Category } from "../types/category";
 import './ArticlesPage.css';
 import plus from "../assets/plus.png"
-import { ArticleContext, type CategoryFilter } from "../context/ArticleContext";
+import { ArticleContext, type ArticleFilter, type CategoryFilter } from "../context/ArticleContext";
 import plusCalendarIcon from "../assets/calendar_plus_icon.png"
 import clockCalendarIcon from "../assets/clock-date-calendar-icon.png"
 
@@ -44,21 +44,28 @@ function ArticlesPage() {
     if (!artContext)
         throw new Error("Article context can't be null");
 
-    const articles = artContext.articles
+    const searchedArticles = artContext.searchedArticles
+    const [filter, setFilter] = useState<ArticleFilter>(artContext.currentFilter);
 
-
-
-
+    useEffect(() => {
+        artContext.setFilter(filter)
+        console.log(filter);
+    },[filter])
 
     return (
         <div >
             <HeaderNavigationDropdown />
-            <FiltersPanel />
-
+            <FiltersPanel filter={filter} onFiltersChange={(f) => {setFilter(prev => ({
+                ...prev,
+                categoryFilters:f.categoryFilters,
+                dateSortType:f.dateSortType,
+                page:f.page,
+                pageSize:f.pageSize
+            }))}} />
             <div className="grid2fr">
                 <div className="articles-pageview">
                     <NewArticleButton onClick={() => { navigate("/article/create") }} />
-                    {articles.map(article => <ArticleCard key={article.id} article={article} />)}
+                    {searchedArticles.map(article => <ArticleCard key={article.id} article={article} />)}
                 </div>
             </div>
         </div>
@@ -85,34 +92,40 @@ function NewArticleButton({ onClick }: { onClick: () => void }) {
     </div>
 }
 
-function FiltersPanel({ }) {
+function FiltersPanel({ filter, onFiltersChange }: {filter : ArticleFilter, onFiltersChange:(filter : ArticleFilter) => void}) {
     return <div className="flex gap40">
         <CategoryFilterBoxes
-            onCheckedFiltersChanged={() => null} />
-        <DateFilterButtons />
+            onCheckedFiltersChanged={(filters) => {filter.categoryFilters = Array.from(filters); onFiltersChange(filter)}} />
+        <DateFilterButtons onCheckedDateFilterChanged={(dateFilter) => {filter.dateSortType = dateFilter; onFiltersChange(filter)}} />
     </div>
 }
 
-function DateFilterButtons({}) {
+function DateFilterButtons({ onCheckedDateFilterChanged }: { onCheckedDateFilterChanged: (dateFilter: number) => void }) {
     try {
+
+        function handleCheck(e: React.ChangeEvent<HTMLInputElement>, sortType: number) {
+            if (e.target.checked)
+                onCheckedDateFilterChanged(sortType);
+        }
+
         return <div className="date-radio-buttons flex column">
             <h3>Data:</h3>
             <br />
             <div>
                 <div>
-                    <input name="date" type="radio" />
+                    <input onChange={(e) => handleCheck(e, 1)} name="date" type="radio" />
                     <label>Recém-atualizados</label>
                 </div>
                 <div>
-                    <input name="date" type="radio" />
+                    <input onChange={(e) => handleCheck(e, 2)} name="date" type="radio" />
                     <label>Previamente atualizados</label>
                 </div>
                 <div>
-                    <input name="date" type="radio" />
+                    <input onChange={(e) => handleCheck(e, 4)} name="date" type="radio" />
                     <label>Mais novos</label>
                 </div>
                 <div>
-                    <input name="date" type="radio" />
+                    <input onChange={(e) => handleCheck(e, 3)} name="date" type="radio" />
                     <label>Mais antigos</label>
                 </div>
             </div>
@@ -206,7 +219,7 @@ function HeaderNavigationDropdown() {
 
             <div id="search" className="search-container flex side-by-side">
                 <p>Pesquisar:</p>
-                <input className="widebar margin-left-10" type="text" />
+                <input disabled className="widebar margin-left-10" type="text" placeholder="Não implementado..." />
 
 
             </div>

@@ -11,7 +11,7 @@ import { ArticleGroupContext } from '../context/ArticleGroupContext';
 function SidebarGroupItem({ articleItem }: { articleItem: ArticleGroupItem }) {
     const articleContext = useContext(ArticleContext);
     const navigate = useNavigate();
-    const title = articleContext?.articles.find(a => a.id === articleItem.articleId)?.title;
+    const title = articleContext?.articles[articleItem.articleId].title;
 
     return (
         <button className="sb-item" onClick={() => navigate(`article/${articleItem.articleId}`)}>

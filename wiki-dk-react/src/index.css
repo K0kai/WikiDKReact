@@ -263,6 +263,9 @@ code {
 .margin-left15{
   margin-left:15px;
 }
+.margin-left5{
+  margin-left:5px;
+}
 .margin-down20{
   margin-bottom:20px;
 }
@@ -357,3 +360,14 @@ code {
 
   border-image-slice: 130;
 }
+.th-loader {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 100;
+    }
