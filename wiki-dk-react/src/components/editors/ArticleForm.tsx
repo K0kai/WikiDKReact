@@ -1,12 +1,13 @@
 import { useState, useContext, useEffect } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import type { CategoryFilter } from "../../context/ArticleContext";
-import { CategoryContext } from "../../context/CategoryContext";
 import type { Article } from "../../types/article";
 import type { Category } from "../../types/category";
 import type { ArticleGroup } from "../../types/articleGroup";
-import { ArticleGroupContext } from "../../context/ArticleGroupContext";
 import "./ArticleForm.css"
+import { useQuery } from "@tanstack/react-query";
+import { createArticleGroupQueryOptions } from "../query_options/articleGroupQueryOptions";
+import { createCategoryQueryOptions } from "../query_options/categoryQueryOptions";
 
 function GroupCheckBox({ group, defaultChecked, style, onCheck }: { group: ArticleGroup, defaultChecked: boolean, style: string, onCheck: (id : number) => void }) {
 
@@ -22,10 +23,9 @@ function GroupCheckBox({ group, defaultChecked, style, onCheck }: { group: Artic
 }
 
 function GroupCheckBoxes({ article, groupStyle , checkBoxStyle, onCheckedGroupsChange }: { article: Article | null, groupStyle: string, checkBoxStyle: string, onCheckedGroupsChange: (groups: number[]) => void }) {
-    const articleGroupContext = useContext(ArticleGroupContext);
-    if (!articleGroupContext)
-        throw new Error("Article group context can't be null");
-    const [containingGroups, setContainingGroups] = useState(articleGroupContext.groupItems.filter(x => x.articleId == article?.id).map(y => y.articleGroupId));
+    const {data} = useQuery(createArticleGroupQueryOptions())
+    var groupItems = data?.flatMap(a => a.items)
+    const [containingGroups, setContainingGroups] = useState<number[]>(groupItems!.filter(x => x?.articleId == article?.id).map(y => y!.articleGroupId));
 
     function handleCheck(id :number){
          setContainingGroups(prev => {
@@ -43,7 +43,7 @@ function GroupCheckBoxes({ article, groupStyle , checkBoxStyle, onCheckedGroupsC
 
     try {
         return <div className={groupStyle}>
-            {articleGroupContext.groups.map(g => <GroupCheckBox key={g.id} group={g} style={checkBoxStyle}  defaultChecked={containingGroups.includes(g.id)} onCheck={(id) => handleCheck(id)} />)}
+            {data?.map(g => <GroupCheckBox key={g.id} group={g} style={checkBoxStyle}  defaultChecked={containingGroups.includes(g.id)} onCheck={(id) => handleCheck(id)} />)}
         </div>
     }
     catch (Err) {
@@ -55,10 +55,7 @@ function GroupCheckBoxes({ article, groupStyle , checkBoxStyle, onCheckedGroupsC
 function CategoryCheckBoxes({ article, onCheckedFiltersChanged }: { article: Article | null, onCheckedFiltersChanged: (checkedFilters: Set<number>) => void }) {
     try {
         const [filters, setFilters] = useState<Set<number>>(new Set(article?.categories))
-        const catContext = useContext(CategoryContext);
-        if (!catContext)
-            throw new Error("Category context can't be null");
-        const categories = catContext.categories
+        const {data} = useQuery(createCategoryQueryOptions());
         filters;
 
         function handleFilterChange(filter: CategoryFilter) {
@@ -76,7 +73,7 @@ function CategoryCheckBoxes({ article, onCheckedFiltersChanged }: { article: Art
         }
 
         return <div id="editor-category-filters" className="category-filters">
-            {categories.map(cat => { return <CategoryBox key={cat.id} defaultCheckState={article?.categories.includes(cat.id) ?? false} category={cat} isChecked={(filter) => { handleFilterChange(filter) }} /> })}
+            {data?.map(cat => { return <CategoryBox key={cat.id} defaultCheckState={article?.categories.includes(cat.id) ?? false} category={cat} isChecked={(filter) => { handleFilterChange(filter) }} /> })}
         </div>
 
     }
@@ -135,14 +132,15 @@ function ArticleForm(
     { article, onSubmit, onDiscard, onPreview }:
         { article: Article | null, onSubmit: (articleFormData: ArticleFormData) => Promise<void>, onDiscard: () => void, onPreview: () => void }
 ) {
-    var authContext = useContext(AuthContext);
-    var artGroupContext = useContext(ArticleGroupContext)
+    const authContext = useContext(AuthContext);
     const [hasPermission, setPermission] = useState<boolean>(false);
     const [title, setTitle] = useState(article?.title)
     const [content, setContent] = useState(article?.content)
     const [thumbnailLink, setThumbnailLink] = useState(article?.thumbnailLink);
     const [checkedCategories, setCheckedCategories] = useState<number[]>(article?.categories ?? [])
-    const [checkedGroups, setCheckedGroups] = useState<number[]>(artGroupContext?.groupItems.filter(gi => gi.articleId == article?.id).map(x => x.articleGroupId) ?? [])
+    const {data} = useQuery(createArticleGroupQueryOptions())
+    const groupItems = data?.flatMap(a => a.items);
+    const [checkedGroups, setCheckedGroups] = useState<number[]>(groupItems?.filter(gi => gi!.articleId == article?.id).map(x => x!.articleGroupId) ?? [])
 
 
     useEffect(() => {

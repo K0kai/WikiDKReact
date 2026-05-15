@@ -1,14 +1,17 @@
-import { useContext, useState } from "react";
-import { RanksContext, type Rank } from "../../context/RankContext";
+import { useState } from "react";
+import { type Rank } from "../../context/RankContext";
+import { createRank } from "../../api/rankAPI";
+import { useQueryClient } from "@tanstack/react-query";
+import { createRanksQueryOptions } from "../query_options/ranksQueryOptions";
 
 
 function RankForm({ rank, mode, onClose }: {rank: Rank, mode: string, onClose:() => void}) {
-    const rankContext = useContext(RanksContext);
 
     const [name, setName] = useState<string>(rank?.name || "");
     const [description, setDescription] = useState<string>(rank?.description || "");
     const [image, setImage] = useState<File | null>(null);
     const [preview, setPreview] = useState<string>(rank?.icon || "");
+    const queryClient = useQueryClient();
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0] || null;
@@ -19,8 +22,7 @@ function RankForm({ rank, mode, onClose }: {rank: Rank, mode: string, onClose:()
         }
     };
 
-    const handleSubmit = () => {
-        if (!rankContext) return;
+    const handleSubmit = async () => {
 
         switch (mode) {
             case "update":
@@ -29,7 +31,8 @@ function RankForm({ rank, mode, onClose }: {rank: Rank, mode: string, onClose:()
                 break;
 
             case "create":
-                rankContext.createRank({ name: name, description: description, image: image });
+                await createRank({ name: name, description: description, image: image });
+                queryClient.invalidateQueries({queryKey: createRanksQueryOptions().queryKey})
                 break;
         }
 

@@ -1,6 +1,8 @@
-import { useContext, useState } from "react";
+import { useState } from "react";
 import type { ArticleGroup } from "../../types/articleGroup";
-import { ArticleGroupContext } from "../../context/ArticleGroupContext";
+import { createGroup, updateGroup } from "../../api/articleGroupAPI";
+import { useQueryClient } from "@tanstack/react-query";
+import { createArticleGroupQueryOptions } from "../query_options/articleGroupQueryOptions";
 
 
 function GroupForm({group, mode, onClose}:{group : ArticleGroup, mode: string, onClose:() => void}){
@@ -8,16 +10,20 @@ function GroupForm({group, mode, onClose}:{group : ArticleGroup, mode: string, o
     const [description, setDescription] = useState<string>(group?.description)
     const [displayHome, setDisplayHome] = useState<boolean>(group?.displayOnHome ?? false);
     const [displaySidebar, setDisplaySidebar] = useState<boolean>(group?.displayOnSidebar ?? false)
-    const articleGroupContext = useContext(ArticleGroupContext)
+    const queryClient = useQueryClient();
+    const groupQuery = createArticleGroupQueryOptions();
+    
 
-     const handleUpdate = () => {
+     const handleUpdate = async () => {
         switch (mode) {
             case "update":
-                articleGroupContext?.updateGroup(group.id, title, description, displayHome, displaySidebar)
+                await updateGroup(group.id, title, description, displayHome, displaySidebar)
+                queryClient.invalidateQueries({queryKey:groupQuery.queryKey})
                 onClose();
                 break;
             case "create":
-                articleGroupContext?.createGroup(title, description, displayHome, displaySidebar)
+                await createGroup(title, description, displayHome, displaySidebar)
+                queryClient.invalidateQueries({queryKey:groupQuery.queryKey})
                 onClose();
                 break;
         }

@@ -5,19 +5,14 @@ import banner from "../assets/dkbanner.png";
 import "./Home.css";
 import { ArticleGroupContext } from "../context/ArticleGroupContext";
 import { useNavigate } from "react-router-dom";
-import { OtherUserContext } from "../context/OtherUserContext";
 import type { Article } from "../types/article";
+import { useQuery } from "@tanstack/react-query";
+import { createSingleUserQueryOptions } from "./query_options/userQueryOptions";
 
 function ArticleCard({ article }: { article: Article }) {
-  const otherUserContext = useContext(OtherUserContext);
 
-  if (!otherUserContext)
-    return <img className="mediumicon" src="https://raw.githubusercontent.com/n3r4zzurr0/svg-spinners/main/preview/ring-resize-white-36.svg" />;
-
-  otherUserContext.getUser(article.authorId);
-  otherUserContext.getUser(article.lastEditorId);
-
-  const { users } = otherUserContext;
+  var editorQuery = useQuery(createSingleUserQueryOptions(article.lastEditorId));
+  var userQuery = useQuery(createSingleUserQueryOptions(article.authorId))
   const navigate = useNavigate();
   return <div onClick={() => navigate(`article/${article.id}`)} key={article.id} className="home-article-card">
     {article.thumbnailLink && (
@@ -29,13 +24,13 @@ function ArticleCard({ article }: { article: Article }) {
         <div>
           <div className="flex side-by-side align-center">
             Autor:
-            <img className="margin-left5 margin-right5 smallicon circular" src={users[article.authorId]?.userIcon ?? "https://cdn-icons-png.flaticon.com/512/149/149071.png"} />
-            {users[article.authorId]?.name ?? "Desconhecido"}
+            <img className="margin-left5 margin-right5 smallicon circular" src={userQuery.data?.userIcon ?? "https://cdn-icons-png.flaticon.com/512/149/149071.png"} />
+            {userQuery.data?.name ?? "Desconhecido"}
           </div>
           <div className="flex side-by-side align-center">
             Ultimo editor:
-            <img className="margin-left5 margin-right5 smallicon circular" src={users[article.lastEditorId]?.userIcon ?? "https://cdn-icons-png.flaticon.com/512/149/149071.png"} />
-            {users[article.lastEditorId]?.name ?? "Desconhecido"}
+            <img className="margin-left5 margin-right5 smallicon circular" src={editorQuery.data?.userIcon ?? "https://cdn-icons-png.flaticon.com/512/149/149071.png"} />
+            {editorQuery.data?.name ?? "Desconhecido"}
           </div>
           Atualizado em: {new Date(article.updated).toLocaleDateString()}
         </div>
