@@ -6,12 +6,14 @@ import shield from "../assets/shield.png"
 import { ArticleContext } from '../context/ArticleContext';
 import type { ArticleGroup } from '../types/articleGroup';
 import type { ArticleGroupItem } from '../types/articleGroupItem';
-import { ArticleGroupContext } from '../context/ArticleGroupContext';
+import { useQuery } from '@tanstack/react-query';
+import { createArticleGroupQueryOptions } from './query_options/articleGroupQueryOptions';
+import { createSingleArticleQueryOptions } from './query_options/articleQueryOptions';
 
 function SidebarGroupItem({ articleItem }: { articleItem: ArticleGroupItem }) {
-    const articleContext = useContext(ArticleContext);
     const navigate = useNavigate();
-    const title = articleContext?.articles[articleItem.articleId].title;
+    const {data} = useQuery(createSingleArticleQueryOptions(articleItem.articleId));
+    const title = data?.title
 
     return (
         <button className="sb-item" onClick={() => navigate(`article/${articleItem.articleId}`)}>
@@ -45,8 +47,8 @@ function SidebarGroup({ articleGroup }: { articleGroup: ArticleGroup }) {
 function Sidebar() {
     const navigate = useNavigate();
     const authContext = useContext(AuthContext);
-    const articleGroupContext = useContext(ArticleGroupContext);
     const [isPermitted, setIsPermitted] = useState(authContext?.hasRole(1));
+    const {data} = useQuery(createArticleGroupQueryOptions())
 
     useEffect(() => {
         setIsPermitted(authContext?.hasRole(1));
@@ -56,8 +58,7 @@ function Sidebar() {
         <div className="sidebar">
             <div className="sb-section">
                 <div className="sb-section-label">Explorar</div>
-                {articleGroupContext?.groups
-                    .filter(g => g.displayOnSidebar)
+                {data?.filter(g => g.displayOnSidebar)
                     .map(g => <SidebarGroup key={g.id} articleGroup={g} />)
                 }
                 <div className="sb-divider" />

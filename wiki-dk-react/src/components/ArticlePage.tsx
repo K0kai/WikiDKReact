@@ -6,18 +6,19 @@ import ReactMarkdown from "react-markdown";
 import editIcon from "../assets/edit-icon.png"
 import trashIcon from "../assets/trash-icon.png"
 import remarkGfm from "remark-gfm";
-import { ArticleContext } from "../context/ArticleContext";
+import { useQuery } from "@tanstack/react-query";
+import { createSingleArticleQueryOptions } from "./query_options/articleQueryOptions";
+import { deleteArticle } from "../api/articleAPI";
 
 
 
 
 
 function ArticlePage() {
-  const articleContext = useContext(ArticleContext);
   const { id } = useParams<{ id: string }>();
   const articleId = parseInt(id || '0');
-  const article = articleContext?.articles[articleId];
-  articleContext?.getArticle(articleId)
+  const {data} = useQuery(createSingleArticleQueryOptions(articleId));
+  const article = data
 
   useEffect(() => {
 
@@ -33,7 +34,7 @@ function ArticlePage() {
       var con = confirm("Essa ação é irreversível, deseja prosseguir?")
       if (!con)
         return;
-      var result = await articleContext?.deleteArticle(articleId);
+      var result = await deleteArticle(articleId);
       if (result){
         alert("Artigo deletado com sucesso!");
         navigate(-1);

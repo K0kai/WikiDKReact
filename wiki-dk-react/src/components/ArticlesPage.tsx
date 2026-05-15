@@ -1,13 +1,15 @@
-import { useState, useContext, useEffect } from "react";
+import { useState, useContext } from "react";
 import { CategoryContext } from "../context/CategoryContext";
 import { useNavigate } from "react-router-dom";
 import type { Article } from "../types/article";
 import type { Category } from "../types/category";
 import './ArticlesPage.css';
 import plus from "../assets/plus.png"
-import { ArticleContext, type ArticleFilter, type CategoryFilter } from "../context/ArticleContext";
+import { type ArticleFilter, type CategoryFilter } from "../context/ArticleContext";
 import plusCalendarIcon from "../assets/calendar_plus_icon.png"
 import clockCalendarIcon from "../assets/clock-date-calendar-icon.png"
+import { useQuery } from "@tanstack/react-query";
+import { createPaginatedArticleQueryOptions } from "./query_options/articleQueryOptions";
 
 
 
@@ -40,16 +42,10 @@ function ArticleCard({ article }: { article: Article }) {
 
 function ArticlesPage() {
     const navigate = useNavigate();
-    const artContext = useContext(ArticleContext);
-    if (!artContext)
-        throw new Error("Article context can't be null");
 
-    const searchedArticles = artContext.searchedArticles
-    const [filter, setFilter] = useState<ArticleFilter>(artContext.currentFilter);
-
-    useEffect(() => {
-        artContext.setFilter(filter)
-    },[filter])
+    
+    const [filter, setFilter] = useState<ArticleFilter>({page: 1, pageSize: 10, categoryFilters: [], dateSortType:1});
+    const {data, isLoading} = useQuery(createPaginatedArticleQueryOptions(filter))
 
     return (
         <div >
@@ -64,7 +60,7 @@ function ArticlesPage() {
             <div className="grid2fr">
                 <div className="articles-pageview">
                     <NewArticleButton onClick={() => { navigate("/article/create") }} />
-                    {searchedArticles.map(article => <ArticleCard key={article.id} article={article} />)}
+                        {isLoading ? (<div className="th-loader"><img className="mediumicon" src="https://raw.githubusercontent.com/n3r4zzurr0/svg-spinners/main/preview/ring-resize-white-36.svg"/></div>) : (<>{data?.map(article => <ArticleCard key={article.id} article={article} />)}</>)}                    
                 </div>
             </div>
         </div>
