@@ -1,10 +1,9 @@
 import { useNavigate, useParams } from "react-router-dom";
-import "./ArticleEditor.css"
 import ArticleForm from "./ArticleForm";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { createSingleArticleQueryOptions } from "../query_options/articleQueryOptions";
 import type { ArticleSubmissionRequest } from "../../types/dto/articleSubmission";
-import { submitArticle } from "../../api/articleAPI";
+import { useSendSubmission } from "../query_options/articleSubmissionsQueryOptions";
 
 
 
@@ -13,12 +12,11 @@ function ArticleEditor() {
     const { id } = useParams<{ id: string }>();
     const { data } = useQuery(createSingleArticleQueryOptions(Number(id)));
     const navigate = useNavigate()
-    const queryClient = useQueryClient();
+    const submit = useSendSubmission()
 
-    async function handleSubmit(articleFormData: ArticleSubmissionRequest) {
-        await submitArticle(articleFormData)
-        queryClient.invalidateQueries({ queryKey: [createSingleArticleQueryOptions(Number(id)).queryKey] })
-        alert(`Submissão encaminhada com sucesso, aguarde a avaliação de um administrador.`)
+    async function handleSubmit(articleSubmissionRequest: ArticleSubmissionRequest) {
+        submit.mutate(articleSubmissionRequest);
+        return submit.isError || submit.isSuccess
     }
     async function handleDiscard() {
         navigate(-1);

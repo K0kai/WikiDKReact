@@ -28,7 +28,7 @@ export default function MessageBox({
       <div className="message-actions">
         {onClose && (
           <button className="btn secondary" onClick={onClose}>
-            Cancel
+            Cancelar
           </button>
         )}
 

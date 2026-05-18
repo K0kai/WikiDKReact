@@ -1,4 +1,4 @@
-import { useState } from "react";
+import {  useState } from "react";
 import type { ArticleGroup } from "../types/articleGroup";
 import banner from "../assets/dkbanner.png";
 import "./Home.css";
@@ -50,6 +50,7 @@ function Home() {
   const homeGroups = groupQuery.data?.filter(g => g.displayOnHome)
   const groupItems = groupQuery.data?.flatMap(a => a.items);
   const selectedGroupItems = groupItems?.filter(gi => gi?.articleGroupId == selectedGroup?.id)
+  
 
   if (groupQuery.isLoading)
     return <div className="th-loader"> <img className="mediumicon" src="https://raw.githubusercontent.com/n3r4zzurr0/svg-spinners/main/preview/ring-resize-white-36.svg"/> </div>
@@ -58,7 +59,7 @@ function Home() {
     <div className="home-page">
       <img className="Banner" src={banner} />
       <div className="home-content">
-
+        
         {selectedGroup ? (
           <>
             <div className="home-section-header">
@@ -102,7 +103,6 @@ function Home() {
             </div>
           </>
         )}
-
       </div>
     </div>
   );

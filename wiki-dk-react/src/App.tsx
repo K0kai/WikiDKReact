@@ -14,14 +14,21 @@ import ArticleCreator from './components/editors/ArticleCreator'
 import UserProfile from './components/UserProfile'
 import Submissions from './components/Submissions'
 import SubmissionPreviewPage from './components/SubmissionPreview'
+import { useToast } from './hooks/useToast'
+import { ToastContainer } from './components/reusable/ToastContainer'
+import { registerToast } from './lib/toast'
 
-function App() {
+function App({}) {
+const { toasts,toast, dismiss } = useToast();
+registerToast(toast)
   return (
     <>
       <Header />
-      <div className="app-container nobg">
+      
+      <div className="app-container nobg">            
         <Sidebar />
-        <div className="mainContent nobg">
+        <ToastContainer toasts={toasts} onDismiss={dismiss} />    
+        <div className="mainContent nobg">          
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/register" element={<Register />} />
@@ -34,7 +41,10 @@ function App() {
             <Route path="/user" element={<UserProfile />} />
             <Route path="/submissions" element={<Submissions/>}/>
             <Route path="preview" element={<SubmissionPreviewPage/>}/>
+            
           </Routes>
+          
+          
         </div>
       </div>
     </>

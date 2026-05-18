@@ -1,0 +1,89 @@
+.toast-root {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 8px;
+  z-index: 9999;
+  pointer-events: none;
+  height: auto;
+}
+
+.toast {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: #141416;
+  border: 1px solid #2a2a34;
+  border-left: 3px solid transparent;
+  padding: 12px 14px 12px 12px;
+  min-width: 260px;
+  max-width: 320px;
+  pointer-events: all;
+  opacity: 0;
+  transform: translateX(16px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  position: relative;
+  overflow: hidden;
+}
+.toast--in { opacity: 1; transform: translateX(0); }
+.toast--success { border-left-color: #4e7e4e; }
+.toast--error   { border-left-color: #7e3e3e; }
+.toast--warn    { border-left-color: #8a6e2e; }
+.toast--info    { border-left-color: #3e5e8e; }
+
+.toast-icon {
+  font-size: 13px;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+.toast--success .toast-icon { color: #6ea86e; }
+.toast--error   .toast-icon { color: #c06060; }
+.toast--warn    .toast-icon { color: #c8a44a; }
+.toast--info    .toast-icon { color: #5e88be; }
+
+.toast-body { flex: 1; min-width: 0; }
+
+.toast-title {
+  font-family: 'Cinzel', serif;
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  color: #c8c7c0;
+  margin-bottom: 2px;
+}
+
+.toast-msg {
+  font-size: 0.75rem;
+  color: #5e5d58;
+  font-weight: 300;
+  line-height: 1.45;
+}
+
+.toast-close {
+  background: none;
+  border: none;
+  color: #3e3e48;
+  font-size: 12px;
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+  margin-top: 1px;
+  transition: color 0.12s;
+}
+.toast-close:hover { color: #9e9d96; }
+
+.toast-bar {
+  position: absolute;
+  bottom: 0; left: 0;
+  height: 1px;
+  width: 100%;
+  animation: drain 4s linear forwards;
+  opacity: 0.3;
+}
+.toast--success .toast-bar { background: #6ea86e; }
+.toast--error   .toast-bar { background: #c06060; }
+.toast--warn    .toast-bar { background: #c8a44a; }
+.toast--info    .toast-bar { background: #5e88be; }
+
+@keyframes drain { from { width: 100%; } to { width: 0%; } }

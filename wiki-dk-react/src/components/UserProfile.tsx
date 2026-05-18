@@ -150,7 +150,7 @@ function ManageUserImageButtons({ onUpload, onRemove }: { onUpload: (imageFile: 
     }
 
     return <div className="flex side-by-side gap20 justify-content-center">
-        <button className="upload pthover" onClick={openFilePicker}>
+        <button className="user-img-upload pthover" onClick={openFilePicker}>
             <img className="whitetint smallicon" src={upload} />
             <input
                 type="file"

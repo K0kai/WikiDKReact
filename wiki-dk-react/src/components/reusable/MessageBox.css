@@ -3,7 +3,7 @@
   border-radius: 12px;
   border: 2px solid;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  background-color: var(--bg);
+ background: #141416;
   max-width: 400px;
 }
 
@@ -11,19 +11,16 @@
 
 .message-box.success {
   border-color: #22c55e;
-  background-color: var(--bg);
   color: #166534;
 }
 
 .message-box.error {
   border-color: #ef4444;
-  background-color: var(--bg);
   color: #991b1b;
 }
 
 .message-box.info {
   border-color: #3b82f6;
-  background-color: var(--bg);
   color: #1e3a8a;
 }
 
@@ -39,10 +36,12 @@
   font-size: 18px;
   font-weight: 600;
   margin-bottom: 8px;
+  font-family: 'Cinzel';
 }
 
 .message-content {
-  margin-bottom: 16px;
+  margin-bottom: 16px;  
+  font-family: 'Inter';
 }
 
 /* ACTIONS */
@@ -61,10 +60,12 @@
   border: none;
   cursor: pointer;
   font-size: 14px;
+  font-family: 'Inter';
 }
 
+
 .btn.primary {
-  background-color: black;
+  background-color: transparent;
   color: rgb(255, 255, 255);
 }
 
@@ -73,7 +74,7 @@
 }
 
 .btn.secondary {
-  background-color: var(--semiTrBg)
+  background-color: transparent;
 }
 
 .btn.secondary:hover {

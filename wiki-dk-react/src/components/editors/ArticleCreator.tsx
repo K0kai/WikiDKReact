@@ -3,25 +3,23 @@ import { AuthContext } from "../../context/AuthContext";
 import ArticleForm from "./ArticleForm";
 import { useNavigate } from "react-router-dom";
 import type { ArticleSubmissionRequest } from "../../types/dto/articleSubmission";
-import { submitArticle } from "../../api/articleAPI";
+import { useSendSubmission } from "../query_options/articleSubmissionsQueryOptions";
 
 
 function ArticleCreator(){
     const navigate = useNavigate();
     const authContext = useContext(AuthContext);
+    const submit = useSendSubmission()
     if (!authContext)
         throw new Error("Auth context can't be null");    
 
-    async function handleSave(formData : ArticleSubmissionRequest){
-        var resp = await submitArticle(formData);
-        console.log(resp);
-        alert("Submissão encaminhada com sucesso, aguarde a aprovação de um administrador.")
+    async function handleSave(articleSubmissionRequest : ArticleSubmissionRequest){
+        submit.mutate(articleSubmissionRequest)
         navigate(-1);
     }
 
     function handleDiscard(){
-
-
+        navigate(-1);
     }
 
     function handlePreview(){

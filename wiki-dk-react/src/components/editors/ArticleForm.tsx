@@ -8,243 +8,261 @@ import { useQuery } from "@tanstack/react-query";
 import { createArticleGroupQueryOptions } from "../query_options/articleGroupQueryOptions";
 import { createCategoryQueryOptions } from "../query_options/categoryQueryOptions";
 import type { ArticleSubmissionRequest } from "../../types/dto/articleSubmission";
-import uploadSymbol from "../../assets/uploadsymbol.png"
+import Modal from "../reusable/Modal";
+import MessageBox from "../reusable/MessageBox";
 
-function GroupCheckBox({ group, defaultChecked, style, onCheck }: { group: ArticleGroup, defaultChecked: boolean, style: string, onCheck: (id: number) => void }) {
-
-    return <>
-        <div className={style}>
-            <label>{group.title}</label>
-            <input type="checkbox" onChange={() => onCheck(group.id)} defaultChecked={defaultChecked} />
-
-
+function GroupCheckBox({ group, defaultChecked, onCheck }: { group: ArticleGroup, defaultChecked: boolean, onCheck: (id: number) => void }) {
+    const checkboxId = `${group.id}_${group.title}`
+    return (
+        <div className="article-form-checkbox" onClick={() => onCheck(group.id)}>
+            <label htmlFor={checkboxId} style={{userSelect:"none"}}>{group.title}</label>
+            <input id={checkboxId} type="checkbox" onChange={() => onCheck(group.id)} defaultChecked={defaultChecked} />
         </div>
-    </>
-
+    );
 }
 
-function GroupCheckBoxes({ article, groupStyle, checkBoxStyle, onCheckedGroupsChange }: { article: Article | null, groupStyle: string, checkBoxStyle: string, onCheckedGroupsChange: (groups: number[]) => void }) {
-    const { data } = useQuery(createArticleGroupQueryOptions())
-    var groupItems = data?.flatMap(a => a.items)
-    const [containingGroups, setContainingGroups] = useState<number[]>(groupItems!.filter(x => x?.articleId == article?.id).map(y => y!.articleGroupId));
+function GroupCheckBoxes({ article, onCheckedGroupsChange }: { article: Article | null, onCheckedGroupsChange: (groups: number[]) => void }) {
+    const { data } = useQuery(createArticleGroupQueryOptions());
+    const groupItems = data?.flatMap(a => a.items);
+    const [containingGroups, setContainingGroups] = useState<number[]>(
+        groupItems?.filter(x => x?.articleId === article?.id).map(y => y!.articleGroupId) ?? []
+    );
 
     function handleCheck(id: number) {
         setContainingGroups(prev => {
-            const next = new Set(prev)
-            if (!next.has(id))
-                next.add(id)
-            else
-                next.delete(id)
-
-            onCheckedGroupsChange(Array.from(next));
-
-            return Array.from(next);
-        })
+            const next = new Set(prev);
+            next.has(id) ? next.delete(id) : next.add(id);
+            const arr = Array.from(next);
+            onCheckedGroupsChange(arr);
+            return arr;
+        });
     }
 
-    try {
-        return <div className={groupStyle}>
-            {data?.map(g => <GroupCheckBox key={g.id} group={g} style={checkBoxStyle} defaultChecked={containingGroups.includes(g.id)} onCheck={(id) => handleCheck(id)} />)}
+    return (
+        <div className="checks-grid">
+            {data?.map(g => (
+                <GroupCheckBox
+                    key={g.id}
+                    group={g}
+                    defaultChecked={containingGroups.includes(g.id)}
+                    onCheck={handleCheck}
+                />
+            ))}
         </div>
-    }
-    catch (Err) {
-        console.error(Err)
-    }
-
+    );
 }
 
 function CategoryCheckBoxes({ article, onCheckedFiltersChanged }: { article: Article | null, onCheckedFiltersChanged: (checkedFilters: Set<number>) => void }) {
-    try {
-        const [filters, setFilters] = useState<Set<number>>(new Set(article?.categories))
-        const { data } = useQuery(createCategoryQueryOptions());
-        filters;
+    const [_filters, setFilters] = useState<Set<number>>(new Set(article?.categories));
+    const { data } = useQuery(createCategoryQueryOptions());
 
-        function handleFilterChange(filter: CategoryFilter) {
-            setFilters(prev => {
-                const next = new Set(prev)
-                if (filter.value)
-                    next.add(filter.id)
-                else
-                    next.delete(filter.id)
+    function handleFilterChange(filter: CategoryFilter) {
+        setFilters(prev => {
+            const next = new Set(prev);
+            filter.value ? next.add(filter.id) : next.delete(filter.id);
+            onCheckedFiltersChanged(next);
+            return next;
+        });
+    }
 
-                onCheckedFiltersChanged(next);
-
-                return next;
-            })
-        }
-
-        return <div id="editor-category-filters" className="category-filters">
-            {data?.map(cat => { return <CategoryBox key={cat.id} defaultCheckState={article?.categories.includes(cat.id) ?? false} category={cat} isChecked={(filter) => { handleFilterChange(filter) }} /> })}
+    return (
+        <div className="checks-grid">
+            {data?.map(cat => (
+                <CategoryBox
+                    key={cat.id}
+                    category={cat}
+                    defaultCheckState={article?.categories.includes(cat.id) ?? false}
+                    isChecked={handleFilterChange}
+                />
+            ))}
         </div>
-
-    }
-    catch (err) {
-        console.error(err);
-    }
-
+    );
 }
 
-
-
-
-
-
 function CategoryBox({ category, defaultCheckState, isChecked }: { category: Category, defaultCheckState: boolean, isChecked: (filter: CategoryFilter) => void }) {
-    try {
-        let id = `${category.name}_${category.id.toString()}`;
-        function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-            const filter: CategoryFilter = {
-                id: category.id,
-                value: e.target.checked
-            };
-
-            isChecked(filter);
-        }
-        return <>
-            <div className="grid g8005">
-                <div>
-                    <img className="smallicon margin-right15" src={category.icon} />
-                    <label className="fontmsmall" htmlFor={`${category.name}_${category.id.toString()}`}>{category.name}</label>
-
-                </div>
-                <div>
-                    <input id={id} type="checkbox" defaultChecked={defaultCheckState} onChange={handleChange} />
-                </div>
-            </div>
-        </>
-
-
-
-    } catch (err) {
-        console.error(err)
-    }
+    const id = `${category.name}_${category.id}`;
+    return (
+        <div className="article-form-checkbox">
+            <label style={{userSelect:"none"}} htmlFor={id}>
+                <img className="smallicon" src={category.icon} alt="" />
+                {category.name}
+            </label>
+            <input
+                id={id}
+                type="checkbox"
+                defaultChecked={defaultCheckState}
+                onChange={e => isChecked({ id: category.id, value: e.target.checked })}
+            />
+        </div>
+    );
 }
 
 export type ArticleFormData = {
-    title: string,
-    content: string,
-    thumbnailLink: string,
-    categories: number[],
-    groups: number[]
+    title: string;
+    content: string;
+    thumbnailLink: string;
+    categories: number[];
+    groups: number[];
 }
 
-
-function ArticleForm(
-    { article, onSubmit, onDiscard, onPreview }:
-        { article: Article | null, onSubmit: (articleSubmission: ArticleSubmissionRequest) => Promise<void>, onDiscard: () => void, onPreview: () => void }
-) {
+function ArticleForm({ article, onSubmit, onDiscard, onPreview }: {
+    article: Article | null;
+    onSubmit: (articleSubmission: ArticleSubmissionRequest) => Promise<boolean>;
+    onDiscard?: () => void;
+    onPreview?: () => void;
+}) {
     const authContext = useContext(AuthContext);
-    const [title, setTitle] = useState(article?.title)
-    const [content, setContent] = useState(article?.content)
-    const [thumbnailFile, setThumbnailFile] = useState<File | undefined>()
+    const [title, setTitle] = useState(article?.title ?? "");
+    const [content, setContent] = useState(article?.content ?? "");
+    const [thumbnailFile, setThumbnailFile] = useState<File | undefined>();
     const [thumbnailPreview, setThumbnailPreview] = useState(article?.thumbnailLink);
-    const [checkedCategories, setCheckedCategories] = useState<number[]>(article?.categories ?? [])
-    const { data } = useQuery(createArticleGroupQueryOptions())
+    const [checkedCategories, setCheckedCategories] = useState<number[]>(article?.categories ?? []);
+    const { data } = useQuery(createArticleGroupQueryOptions());
     const groupItems = data?.flatMap(a => a.items);
-    const [checkedGroups, setCheckedGroups] = useState<number[]>(groupItems?.filter(gi => gi!.articleId == article?.id).map(x => x!.articleGroupId) ?? [])
-    const authorId = authContext?.user?.id ?? -1
-    const [authorName, setAuthorName] = useState<string>(authContext?.user?.name ?? "")
+    const [checkedGroups, setCheckedGroups] = useState<number[]>(
+        groupItems?.filter(gi => gi!.articleId === article?.id).map(x => x!.articleGroupId) ?? []
+    );
+    const [authorName, setAuthorName] = useState(authContext?.user?.name ?? "");
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const [modal, setModal] = useState<string>();
+    const [emptyFields, setEmptyFields] = useState<string[]>([]);
+    const [isSaving, setIsSaving] = useState<boolean>(false)
 
+    async function handleSave() {
+        const empty: string[] = [];
+        if (!authorName.trim()) empty.push("'Nome do autor'");
+        if (!title.trim()) empty.push("'Título'");
+        if (!content.trim()) empty.push("'Conteúdo'");
 
+        setEmptyFields(empty);
+        if (empty.length > 0) { setModal("failed-submit"); return; }
 
-
-    function SaveDiscardButtons({ onSubmit, onDiscard, onPreview }: { onSubmit: () => void, onDiscard: () => void, onPreview: () => void }) {
-        return <div className="btns-container">
-            <button className="bigbutton noborder pthover semitransparent save" onClick={onSubmit}>Salvar</button>
-            <button className="bigbutton noborder pthover semitransparent discard" onClick={onDiscard}>Descartar</button>
-            <button className="bigbutton noborder pthover semitransparent preview" onClick={onPreview}>Preview</button>
-        </div>
-    }
-
-    function handleSave() {
-        if (!authorName || authorName.trim().length === 0) {
-            alert("Nome do autor é um campo obrigatório")
-            return;
-        }
-        if (title && content) {
-            const formData: ArticleSubmissionRequest = {
-                title: title,
-                articleId: article?.id ?? null,
-                description: null,
-                thumbnailFile: thumbnailFile ?? null,
-                submitterId: authorId,
-                submitterName: authorName,
-                content: content,
-                categories: checkedCategories,
-                groups: checkedGroups,
-                type: article ? "update" : "create"
-            }
-            alert("ok");
-            onSubmit(formData);
-        }
+        var resp = await onSubmit({
+            title,
+            articleId: article?.id ?? null,
+            description: null,
+            thumbnailFile: thumbnailFile ?? null,
+            submitterId: authContext?.user?.id ?? -1,
+            submitterName: authorName,
+            content,
+            categories: checkedCategories,
+            groups: checkedGroups,
+            type: article ? "update" : "create"
+        });
+        setIsSaving(resp)
     }
 
     function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
         const file = e.target.files?.[0];
-        if (!file)
-            return;
-
-        const localUrl = URL.createObjectURL(file);
-
-        setThumbnailPreview(localUrl);
+        if (!file) return;
+        setThumbnailPreview(URL.createObjectURL(file));
         setThumbnailFile(file);
     }
 
-
     return (
         <>
-            {
-                <>
-                    {
-                        <div className="mainContainer">
-                            <p>Titulo:</p>
-                            <br />
-                            <input type="text" onChange={e => setTitle(e.target.value)} defaultValue={article?.title} id="title" className="title-input gbluebg noborder" />
-                            <p className="subt-small">Titulo original:</p>
-                            <p className="subt-small">{article?.title}</p>
-                            <br />
-                            <div className="flex column align-center gap20">
-                                <p>Foto Thumbnail:</p>
-                                <img id='thumbPreview' className="previewImage" src={thumbnailPreview} />
-                                <button className="upload pthover margin-down20" onClick={() => fileInputRef.current?.click()}>
-                                    <img className="smallicon whitetint" src={uploadSymbol} />
-                                    <input
-                                        type="file"
-                                        accept="image/png, image/jpeg, image/webp"
-                                        ref={fileInputRef}
-                                        style={{ display: "none" }}
-                                        onChange={handleImageUpload}
-                                    />
-                                </button>
-                            </div>
+            {modal === "failed-submit" && (
+                <Modal onClose={() => setModal("")}>
+                    <MessageBox
+                        title="Erro"
+                        message={`Os campos: ${emptyFields.join(', ')} não podem estar vazios`}
+                        onClose={() => setModal("")}
+                        onConfirm={() => setModal("")}
+                        type="error"
+                    />
+                </Modal>
+            )}
 
-                            <br />
-                            <br />
-                            <p>Conteudo:</p>
-                            <textarea defaultValue={article?.content} onChange={e => setContent(e.target.value)} id="content" className="content-input gbluebg noborder" />
-                            <br />
-                            <p className="margin-down20">Se encaixa em:</p>
-                            <CategoryCheckBoxes article={article ?? null} onCheckedFiltersChanged={(checkedCategories) => setCheckedCategories(Array.from(checkedCategories))} />
+            <div className="mainContainer">
 
-                            <div className="groupBoxes">
-                                <p className="margin-down20 ">Mostrar em:</p>
-                                <GroupCheckBoxes article={article ?? null} groupStyle={"posright50"} checkBoxStyle="grid g5005" onCheckedGroupsChange={(groups) => setCheckedGroups(groups)} />
-                            </div>
-                            {authContext?.isAuthenticated ? (<></>) : (<div className="margin-top30">
-                                Autor: <input type="text" defaultValue={authorName} onChange={(e) => setAuthorName(e.target.value)} />
-                            </div>)}
+                <div className="form-section">
+                    <label className="field-label" htmlFor="title">Título</label>
+                    <input
+                        id="title"
+                        className="title-input"
+                        type="text"
+                        defaultValue={article?.title}
+                        onChange={e => setTitle(e.target.value)}
+                        placeholder="Nome do artigo..."
+                    />
+                    {article?.title && (
+                        <p className="field-hint">Título original: {article.title}</p>
+                    )}
+                </div>
 
-
-
-                            <SaveDiscardButtons onSubmit={handleSave} onDiscard={onDiscard} onPreview={onPreview} />
+                <div className="form-section">
+                    <label className="field-label">Thumbnail</label>
+                    <div className="thumb-zone">
+                        {thumbnailPreview
+                            ? <img className="previewImage" src={thumbnailPreview} alt="preview" />
+                            : <div className="previewImage thumb-placeholder">sem imagem</div>
+                        }
+                        <div className="thumb-right">
+                            <p className="field-hint">Formatos aceitos: PNG, JPG, WEBP.</p>
+                            <button className="upload" onClick={() => fileInputRef.current?.click()}>
+                                ↑ Carregar imagem
+                            </button>
+                            <input
+                                type="file"
+                                accept="image/png, image/jpeg, image/webp"
+                                ref={fileInputRef}
+                                style={{ display: "none" }}
+                                onChange={handleImageUpload}
+                            />
                         </div>
-                    }
+                    </div>
+                </div>
 
-                </>
-            }
+                <div className="form-section">
+                    <label className="field-label" htmlFor="content">Conteúdo</label>
+                    <textarea
+                        id="content"
+                        className="content-input"
+                        defaultValue={article?.content}
+                        onChange={e => setContent(e.target.value)}
+                        placeholder="Escreva o conteúdo do artigo..."
+                    />
+                </div>
+
+                <div className="form-section">
+                    <label className="field-label">Categorias</label>
+                    <CategoryCheckBoxes
+                        article={article}
+                        onCheckedFiltersChanged={f => setCheckedCategories(Array.from(f))}
+                    />
+                </div>
+
+                <div className="form-section">
+                    <label className="field-label">Mostrar em</label>
+                    <GroupCheckBoxes
+                        article={article}
+                        onCheckedGroupsChange={setCheckedGroups}
+                    />
+                </div>
+
+                {!authContext?.isAuthenticated && (
+                    <div className="form-section">
+                        <label className="field-label" htmlFor="author">Autor</label>
+                        <input
+                            id="author"
+                            className="title-input"
+                            type="text"
+                            defaultValue={authorName}
+                            onChange={e => setAuthorName(e.target.value)}
+                            placeholder="Seu nome..."
+                        />
+                    </div>
+                )}
+
+                <div className="btns-container">
+                    <button className="bigbutton save" onClick={handleSave}>{isSaving ? (<img className="smallicon" src="https://raw.githubusercontent.com/n3r4zzurr0/svg-spinners/main/preview/ring-resize-white-36.svg"/>) : (<>Salvar</>)}</button>
+                    <button className="bigbutton preview" onClick={onPreview}>Preview</button>
+                    <button className="bigbutton discard" onClick={onDiscard}>Descartar</button>
+                </div>
+
+            </div>
         </>
-    )
+    );
 }
 
-export default ArticleForm
+export default ArticleForm;
