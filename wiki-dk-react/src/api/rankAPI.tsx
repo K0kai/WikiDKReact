@@ -1,4 +1,4 @@
-import type { Rank, RankCreateRequest } from "../context/RankContext";
+import type { Rank, RankCreateRequest } from "../types/rank";
 
 const API_URL = import.meta.env.VITE_API_URL
 
