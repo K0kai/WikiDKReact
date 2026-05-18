@@ -16,7 +16,7 @@ type AuthContextType = {
   isAuthenticated: boolean;
   hasRole: (minRole: number) => boolean;
   logout: () => void;
-  login: (name : string, password: string) => Promise<boolean | undefined>;
+  login: (name : string, password: string) => Promise<boolean>;
   refreshUser: () => Promise<void>
 }
 
@@ -84,10 +84,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const data = await response.json();
 
         localStorage.setItem('token', data.token);
-
         checkAuthentication();
         return true;
       }
+      return false;
     }
     catch (err) {
       console.error(err);

@@ -15,10 +15,15 @@ function SidebarGroupItem({ articleItem }: { articleItem: ArticleGroupItem }) {
     const { data: articles } = useQuery(createGroupedArticleQueryOptions());
 
     const article = articles?.find(a => a.id === articleItem.articleId);
+    const [title, setTitle] = useState<string>()
+
+    useEffect(() => {
+        setTitle(article?.title ?? '...')
+    },[article])
 
     return (
         <button className="sb-item" onClick={() => navigate(`article/${articleItem.articleId}`)}>
-            {article?.title ?? '...'}
+            {title}
         </button>
     );
 }

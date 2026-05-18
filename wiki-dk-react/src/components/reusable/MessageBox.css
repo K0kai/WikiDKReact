@@ -1,0 +1,81 @@
+.message-box {
+  padding: 16px;
+  border-radius: 12px;
+  border: 2px solid;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  background-color: var(--bg);
+  max-width: 400px;
+}
+
+/* TYPES */
+
+.message-box.success {
+  border-color: #22c55e;
+  background-color: var(--bg);
+  color: #166534;
+}
+
+.message-box.error {
+  border-color: #ef4444;
+  background-color: var(--bg);
+  color: #991b1b;
+}
+
+.message-box.info {
+  border-color: #3b82f6;
+  background-color: var(--bg);
+  color: #1e3a8a;
+}
+
+.message-box.warning {
+  border-color: #f59e0b;
+  background-color: var(--bg);
+  color: #92400e;
+}
+
+/* TEXT */
+
+.message-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.message-content {
+  margin-bottom: 16px;
+}
+
+/* ACTIONS */
+
+.message-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* BUTTONS */
+
+.btn {
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.btn.primary {
+  background-color: black;
+  color: rgb(255, 255, 255);
+}
+
+.btn.primary:hover {
+  opacity: 0.9;
+}
+
+.btn.secondary {
+  background-color: var(--semiTrBg)
+}
+
+.btn.secondary:hover {
+  opacity: 0.9;
+}

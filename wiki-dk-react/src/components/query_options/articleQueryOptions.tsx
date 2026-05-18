@@ -35,7 +35,7 @@ export function createGroupedArticleQueryOptions(){
     return queryOptions({
         queryKey:["articles", "grouped"],
         queryFn: () => fetchGroupedArticles(),
-        staleTime: 300000
+        staleTime: 300000,
     })
 
     async function fetchGroupedArticles(): Promise<Article[]>{
