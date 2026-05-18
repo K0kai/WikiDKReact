@@ -1,6 +1,5 @@
 import { queryOptions } from "@tanstack/react-query";
-import type { ArticleFilter } from "../../context/ArticleContext";
-import type { Article } from "../../types/article";
+import type { Article, ArticleFilter } from "../../types/article";
 
 const API_URL = import.meta.env.VITE_API_URL
 
@@ -13,6 +12,20 @@ export function createSingleArticleQueryOptions(id : number){
 
     async function fetchSingleArticle() : Promise<Article>{
         var resp = await fetch(`${API_URL}/articles/get/${id}`)
+        return await resp.json();
+    }
+}
+
+export function createMultipleArticleQueryOptions(ids : string){
+    return queryOptions({
+        queryKey:["articles", ids],
+        queryFn: () => fetchMultipleArticles(),
+        staleTime:60000
+
+    })
+
+    async function fetchMultipleArticles() : Promise<Article[]>{
+        var resp = await fetch(`${API_URL}/articles/get?ids=${ids}`)
         return await resp.json();
     }
 }

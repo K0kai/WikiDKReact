@@ -11,13 +11,13 @@ import type { ArticleGroup } from "../types/articleGroup";
 import Modal from "./reusable/Modal";
 import CategoryForm from "./reusable/CategoryForm";
 import GroupForm from "./reusable/GroupForm";
-import { type Rank } from "../context/RankContext";
 import RankForm from "./reusable/RankForm";
 import { useQuery } from "@tanstack/react-query";
 import { createCategoryQueryOptions } from "./query_options/categoryQueryOptions";
 import { createRanksQueryOptions } from "./query_options/ranksQueryOptions";
 import { createArticleGroupQueryOptions } from "./query_options/articleGroupQueryOptions";
 import { deleteCategory } from "../api/categoryAPI";
+import type { Rank } from "../types/rank";
 
 /* ---------------- GLOBALS ---------------- */
 
@@ -194,7 +194,7 @@ export default function ManagerHub() {
 
 
     useEffect(() => {
-        setIsPermitted(authContext?.hasRole(1) ?? false);
+        setIsPermitted(authContext?.hasRole(2) ?? false);
     }, [authContext]);
 
     if (!isPermitted) return <p>Unauthorized</p>;

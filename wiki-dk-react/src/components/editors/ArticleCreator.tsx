@@ -1,29 +1,21 @@
-import { useContext, useState } from "react";
+import { useContext } from "react";
 import { AuthContext } from "../../context/AuthContext";
-import ArticleForm, { type ArticleFormData } from "./ArticleForm";
-import { ArticleContext } from "../../context/ArticleContext";
+import ArticleForm from "./ArticleForm";
 import { useNavigate } from "react-router-dom";
+import type { ArticleSubmissionRequest } from "../../types/dto/articleSubmission";
+import { submitArticle } from "../../api/articleAPI";
 
 
 function ArticleCreator(){
     const navigate = useNavigate();
     const authContext = useContext(AuthContext);
-    const articleContext = useContext(ArticleContext)
     if (!authContext)
         throw new Error("Auth context can't be null");    
-    if (!articleContext)
-        throw new Error("Article context can't be null");
 
-    const [hasPermission, setHasPermission] = useState<boolean>(false);
-
-    useState(()=>{
-        setHasPermission(authContext?.hasRole(1))
-    })
-
-    async function handleSave(formData : ArticleFormData){
-        articleContext?.createArticle(formData);
-        console.log(formData);
-        alert("Article created!")
+    async function handleSave(formData : ArticleSubmissionRequest){
+        var resp = await submitArticle(formData);
+        console.log(resp);
+        alert("Submissão encaminhada com sucesso, aguarde a aprovação de um administrador.")
         navigate(-1);
     }
 
@@ -36,11 +28,8 @@ function ArticleCreator(){
 
     }
 
-    return <>
-    {hasPermission ? (<>
+    return <>    
     <ArticleForm article={null} onSubmit={handleSave} onDiscard={handleDiscard} onPreview={handlePreview} ></ArticleForm>
-    </>) 
-    :(<p>Unauthorized</p>)}
     </>
 
 }

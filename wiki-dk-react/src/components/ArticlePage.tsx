@@ -1,5 +1,4 @@
-import { AuthContext } from "../context/AuthContext";
-import { useContext, useEffect } from "react";
+import { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import './ArticlePage.css';
 import ReactMarkdown from "react-markdown";
@@ -27,8 +26,6 @@ function ArticlePage() {
 
   function ManageButtons() {
     const navigate = useNavigate();
-    var authContext = useContext(AuthContext);
-    if (!authContext?.hasRole(1)) return null;
 
     async function handleDelete() {
       var con = confirm("Essa ação é irreversível, deseja prosseguir?")

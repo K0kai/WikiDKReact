@@ -1,10 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import type { Article } from "../types/article";
+import type { Article, ArticleFilter, CategoryFilter } from "../types/article";
 import type { Category } from "../types/category";
 import './ArticlesPage.css';
 import plus from "../assets/plus.png"
-import { type ArticleFilter, type CategoryFilter } from "../context/ArticleContext";
 import plusCalendarIcon from "../assets/calendar_plus_icon.png"
 import clockCalendarIcon from "../assets/clock-date-calendar-icon.png"
 import { useQuery } from "@tanstack/react-query";

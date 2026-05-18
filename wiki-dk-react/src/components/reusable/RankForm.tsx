@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { type Rank } from "../../context/RankContext";
+import { type Rank } from "../../types/rank";
 import { createRank } from "../../api/rankAPI";
 import { useQueryClient } from "@tanstack/react-query";
 import { createRanksQueryOptions } from "../query_options/ranksQueryOptions";
