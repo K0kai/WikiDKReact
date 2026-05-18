@@ -16,6 +16,7 @@ function ArticleCreator(){
     async function handleSave(articleSubmissionRequest : ArticleSubmissionRequest){
         submit.mutate(articleSubmissionRequest)
         navigate(-1);
+        return submit.isError || submit.isSuccess
     }
 
     function handleDiscard(){
