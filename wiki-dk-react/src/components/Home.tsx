@@ -1,43 +1,40 @@
-import { useContext, useState } from "react";
-import { ArticleContext } from "../context/ArticleContext";
+import { useState } from "react";
 import type { ArticleGroup } from "../types/articleGroup";
 import banner from "../assets/dkbanner.png";
 import "./Home.css";
-import { ArticleGroupContext } from "../context/ArticleGroupContext";
 import { useNavigate } from "react-router-dom";
-import { OtherUserContext } from "../context/OtherUserContext";
-import type { Article } from "../types/article";
+import { useQuery } from "@tanstack/react-query";
+import { createSingleUserQueryOptions } from "./query_options/userQueryOptions";
+import { createArticleGroupQueryOptions } from "./query_options/articleGroupQueryOptions";
+import { createSingleArticleQueryOptions } from "./query_options/articleQueryOptions";
 
-function ArticleCard({ article }: { article: Article }) {
-  const otherUserContext = useContext(OtherUserContext);
+function ArticleCard({ articleId }: { articleId: number }) {
 
-  if (!otherUserContext)
-    return <img className="mediumicon" src="https://raw.githubusercontent.com/n3r4zzurr0/svg-spinners/main/preview/ring-resize-white-36.svg" />;
+  var articleQuery = useQuery(createSingleArticleQueryOptions(articleId));
+  const article = articleQuery.data  
+  var userQuery = useQuery(createSingleUserQueryOptions(article?.authorId))
+  var editorQuery =  useQuery(createSingleUserQueryOptions(article?.lastEditorId));
 
-  otherUserContext.getUser(article.authorId);
-  otherUserContext.getUser(article.lastEditorId);
-
-  const { users } = otherUserContext;
   const navigate = useNavigate();
-  return <div onClick={() => navigate(`article/${article.id}`)} key={article.id} className="home-article-card">
-    {article.thumbnailLink && (
+  return <div onClick={() => navigate(`article/${article?.id}`)} key={article?.id} className="home-article-card">
+    {article?.thumbnailLink && (
       <img className="home-article-thumb" src={article.thumbnailLink} alt="" />
     )}
     <div className="home-article-info">
-      <div className="home-article-title">{article.title}</div>
+      <div className="home-article-title">{article?.title}</div>
       <div className="home-article-meta">
         <div>
           <div className="flex side-by-side align-center">
             Autor:
-            <img className="margin-left5 margin-right5 smallicon circular" src={users[article.authorId]?.userIcon ?? "https://cdn-icons-png.flaticon.com/512/149/149071.png"} />
-            {users[article.authorId]?.name ?? "Desconhecido"}
+            <img className="margin-left5 margin-right5 smallicon circular" src={userQuery.data?.userIcon ?? "https://cdn-icons-png.flaticon.com/512/149/149071.png"} />
+            {userQuery.data?.name ?? "Desconhecido"}
           </div>
           <div className="flex side-by-side align-center">
             Ultimo editor:
-            <img className="margin-left5 margin-right5 smallicon circular" src={users[article.lastEditorId]?.userIcon ?? "https://cdn-icons-png.flaticon.com/512/149/149071.png"} />
-            {users[article.lastEditorId]?.name ?? "Desconhecido"}
+            <img className="margin-left5 margin-right5 smallicon circular" src={editorQuery.data?.userIcon ?? "https://cdn-icons-png.flaticon.com/512/149/149071.png"} />
+            {editorQuery.data?.name ?? "Desconhecido"}
           </div>
-          Atualizado em: {new Date(article.updated).toLocaleDateString()}
+          Atualizado em: {new Date(article?.updated ?? "").toLocaleDateString()}
         </div>
 
       </div>
@@ -46,26 +43,16 @@ function ArticleCard({ article }: { article: Article }) {
 }
 
 function Home() {
-  const articleContext = useContext(ArticleContext);
-  const articleGroupContext = useContext(ArticleGroupContext);
   const [selectedGroup, setSelectedGroup] = useState<ArticleGroup | null>(null);
 
-  if (!articleContext || !articleGroupContext) {
-    return <div>Error: context missing</div>;
-  }
-  if (articleContext.isLoading)
-    return <div className="margin-left15 th-loader">
-      <img className="" src="https://raw.githubusercontent.com/n3r4zzurr0/svg-spinners/main/preview/ring-resize-white-36.svg" />
-    </div>
-  const { articles } = articleContext;
-  const homeGroups = articleGroupContext?.groups.filter((g) => g.displayOnHome);
-  const articleKeys = Object.keys(articles).map(Number);
 
-  const groupArticles = selectedGroup
-    ? articleGroupContext.groupItems
-      .filter((i) => i.articleGroupId === selectedGroup.id)
-      .filter((i) => articleKeys.includes(i.articleId))
-    : [];
+  const groupQuery = useQuery(createArticleGroupQueryOptions())
+  const homeGroups = groupQuery.data?.filter(g => g.displayOnHome)
+  const groupItems = groupQuery.data?.flatMap(a => a.items);
+  const selectedGroupItems = groupItems?.filter(gi => gi?.articleGroupId == selectedGroup?.id)
+
+  if (groupQuery.isLoading)
+    return <div className="th-loader"> <img className="mediumicon" src="https://raw.githubusercontent.com/n3r4zzurr0/svg-spinners/main/preview/ring-resize-white-36.svg"/> </div>
 
   return (
     <div className="home-page">
@@ -82,11 +69,11 @@ function Home() {
               <p className="home-group-desc home-group-desc--hero">{selectedGroup.description}</p>
             )}
             <div className="home-articles-list">
-              {groupArticles?.length === 0 && (
+              {selectedGroupItems?.length === 0 && (
                 <p className="home-empty">Sem artigos neste grupo ainda.</p>
               )}
-              {groupArticles?.map((articleGroupItem) => articleGroupItem && (
-                <ArticleCard key={articleGroupItem.id} article={articles[articleGroupItem.articleId]} />
+              {selectedGroupItems?.map((articleGroupItem) => articleGroupItem && (
+                <ArticleCard key={articleGroupItem.id} articleId={articleGroupItem.articleId} />
               ))}
             </div>
           </>

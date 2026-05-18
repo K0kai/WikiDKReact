@@ -1,23 +1,23 @@
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
-import { CategoryContext } from "../context/CategoryContext";
 import "./ManagerHub.css";
 import "./reusable/Modal.css"
-
 import arrow from "../assets/right_arrow.svg";
 import plus from "../assets/plus.png";
 import editIcon from "../assets/edit-icon.png";
 import trashIcon from "../assets/trash-icon.png";
-
 import type { Category } from "../types/category";
 import type { ArticleGroup } from "../types/articleGroup";
-import { ArticleContext } from "../context/ArticleContext";
 import Modal from "./reusable/Modal";
 import CategoryForm from "./reusable/CategoryForm";
 import GroupForm from "./reusable/GroupForm";
-import { ArticleGroupContext } from "../context/ArticleGroupContext";
-import { RanksContext, type Rank } from "../context/RankContext";
 import RankForm from "./reusable/RankForm";
+import { useQuery } from "@tanstack/react-query";
+import { createCategoryQueryOptions } from "./query_options/categoryQueryOptions";
+import { createRanksQueryOptions } from "./query_options/ranksQueryOptions";
+import { createArticleGroupQueryOptions } from "./query_options/articleGroupQueryOptions";
+import { deleteCategory } from "../api/categoryAPI";
+import type { Rank } from "../types/rank";
 
 /* ---------------- GLOBALS ---------------- */
 
@@ -40,10 +40,7 @@ type ModalState = {
 
 /* ---------------- UI HELPERS ---------------- */
 
-function ViewRank({rank, onOpenEditModal}: {rank : Rank, onOpenEditModal:(rank: Rank) => void}){
-    const rankContext = useContext(RanksContext)
-    if (!rankContext)
-        throw new Error("Rank context can't be null");
+function ViewRank({ rank, onOpenEditModal }: { rank: Rank, onOpenEditModal: (rank: Rank) => void }) {
 
     return (
         <div
@@ -70,8 +67,6 @@ function ViewRank({rank, onOpenEditModal}: {rank : Rank, onOpenEditModal:(rank: 
 }
 
 function ViewGroup({ group, onOpenEditModal }: { group: ArticleGroup, onOpenEditModal: (group: ArticleGroup) => void }) {
-    const articleContext = useContext(ArticleContext);
-    if (!articleContext) throw new Error("Article context can't be null");
 
     const handleDelete = async (group: ArticleGroup) => {
         const confirmation = confirm(
@@ -107,9 +102,6 @@ function ViewGroup({ group, onOpenEditModal }: { group: ArticleGroup, onOpenEdit
 
 function ViewCategory({ category, onOpenEditModal }: { category: Category, onOpenEditModal: (category: Category) => void }) {
 
-    const catContext = useContext(CategoryContext);
-    if (!catContext) throw new Error("Category Context cant be null");
-
     const handleDelete = async (category: Category) => {
         const confirmation = confirm(
             `Tem certeza que deseja apagar ${category.name}? essa ação é irreversível`
@@ -117,7 +109,7 @@ function ViewCategory({ category, onOpenEditModal }: { category: Category, onOpe
 
         if (!confirmation) return;
 
-        await catContext.deleteCategory(category.id);
+        await deleteCategory(category.id);
     };
 
     return (
@@ -192,22 +184,17 @@ export default function ManagerHub() {
     const [isPermitted, setIsPermitted] = useState(false);
     const [modalState, setModalState] = useState<ModalState>({ type: null, mode: "", payload: null })
 
-    const catContext = useContext(CategoryContext);
-    const articleGroupContext = useContext(ArticleGroupContext);
-    const rankContext = useContext(RanksContext);
-    if (!catContext)
-        throw new Error("Category Context cant be null");
-    if (!articleGroupContext)
-        throw new Error("Article context can't be null");
-    if (!rankContext)
-        throw new Error("Rank context can't be null");
+    const categoryQuery = useQuery(createCategoryQueryOptions())
+    const rankQuery = useQuery(createRanksQueryOptions())
+    const articleGroupQuery = useQuery(createArticleGroupQueryOptions())
 
-    const categories = catContext.categories
-    const articleGroups = articleGroupContext.groups
+    const categories = categoryQuery.data
+    const articleGroups = articleGroupQuery.data
+    const ranks = rankQuery.data
 
 
     useEffect(() => {
-        setIsPermitted(authContext?.hasRole(1) ?? false);
+        setIsPermitted(authContext?.hasRole(2) ?? false);
     }, [authContext]);
 
     if (!isPermitted) return <p>Unauthorized</p>;
@@ -224,14 +211,14 @@ export default function ManagerHub() {
                 <Modal children={<RankForm rank={modalState.payload} onClose={() => setModalState({ type: null, mode: "", payload: null })} mode={modalState.mode} />} onClose={() => { setModalState({ type: null, mode: "", payload: null }) }} />
             </>) : (<></>)}
             <div className="dropdowns-container">
-
+                {categoryQuery.isLoading ? (<></>) : (<></>)}
                 <Dropdown
                     name="Categorias"
                     onOpenModal={() => setModalState({ type: "category", mode: "create", payload: null })}
                     onOpenEditModal={(category) => {
                         setModalState({ type: "category", mode: "update", payload: category });
                     }}
-                    children={categories.map(cat => <ViewCategory key={cat.id} category={cat} onOpenEditModal={(cat) => setModalState({ type: "category", mode: "update", payload: cat })} />)}
+                    children={!categoryQuery.isLoading ? (categories?.map(cat => <ViewCategory key={cat.id} category={cat} onOpenEditModal={(cat) => setModalState({ type: "category", mode: "update", payload: cat })} />)) : (<><img className="mediumicon" src="https://raw.githubusercontent.com/n3r4zzurr0/svg-spinners/main/preview/ring-resize-white-36.svg"/></>)}
 
                 />
                 <Dropdown
@@ -240,7 +227,7 @@ export default function ManagerHub() {
                     onOpenEditModal={(group) => {
                         setModalState({ type: "group", mode: "update", payload: group });
                     }}
-                    children={articleGroups.map(artG => <ViewGroup key={artG.id} group={artG} onOpenEditModal={(artG) => setModalState({ type: "group", mode: "update", payload: artG })} />)}
+                    children={!articleGroupQuery.isLoading ? (articleGroups?.map(artG => <ViewGroup key={artG.id} group={artG} onOpenEditModal={(artG) => setModalState({ type: "group", mode: "update", payload: artG })} />)) : (<><img className="mediumicon" src="https://raw.githubusercontent.com/n3r4zzurr0/svg-spinners/main/preview/ring-resize-white-36.svg"/></>)}
                 />
                 <Dropdown
                     name="Patentes"
@@ -248,7 +235,7 @@ export default function ManagerHub() {
                     onOpenEditModal={(group) => {
                         setModalState({ type: "rank", mode: "update", payload: group });
                     }}
-                    children={rankContext.ranks.map(rank => <ViewRank key={rank.id} rank={rank} onOpenEditModal={(rank) => setModalState({ type: "rank", mode: "update", payload: rank })} />)}
+                    children={!rankQuery.isLoading ? (ranks?.map(rank => <ViewRank key={rank.id} rank={rank} onOpenEditModal={(rank) => setModalState({ type: "rank", mode: "update", payload: rank })} />)) : (<><img className="mediumicon" src="https://raw.githubusercontent.com/n3r4zzurr0/svg-spinners/main/preview/ring-resize-white-36.svg"/></>)}
                 />
             </div>
         </>

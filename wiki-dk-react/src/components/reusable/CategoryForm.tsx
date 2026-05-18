@@ -1,31 +1,35 @@
-import { useContext, useState } from "react";
-import { CategoryContext } from "../../context/CategoryContext";
+import { useState } from "react";
+import { createCategory, updateCategory } from "../../api/categoryAPI";
 import type { Category } from "../../types/category";
+import { useQueryClient } from "@tanstack/react-query";
+import { createCategoryQueryOptions } from "../query_options/categoryQueryOptions";
 
 
 function CategoryForm({ category, mode, onClose }: {category: Category, mode: string, onClose:() => void}) {
-    const catContext = useContext(CategoryContext);
 
     const [name, setName] = useState<string>(category?.name || "");
     const [description, setDescription] = useState<string>(category?.description || "");
     const [icon, setIcon] = useState<string>(category?.icon || "");
+    const queryClient = useQueryClient();
+    var categoryQuery = createCategoryQueryOptions();
 
-    const handleSubmit = () => {
-        if (!catContext) return;
+    const handleSubmit = async () => {
 
         switch (mode) {
             case "update":
-                catContext.updateCategory(
+                await updateCategory(
                     category.id,
                     name,
                     description,
                     category.slug,
                     icon
                 );
+                queryClient.invalidateQueries({queryKey: categoryQuery.queryKey})
                 break;
 
             case "create":
-                catContext.createCategory(name, description, icon);
+                await createCategory(name, description, icon);
+                queryClient.invalidateQueries({queryKey: categoryQuery.queryKey})
                 break;
         }
 

@@ -1,13 +1,14 @@
-import { useState, useContext, useEffect } from "react";
-import { CategoryContext } from "../context/CategoryContext";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import type { Article } from "../types/article";
+import type { Article, ArticleFilter, CategoryFilter } from "../types/article";
 import type { Category } from "../types/category";
 import './ArticlesPage.css';
 import plus from "../assets/plus.png"
-import { ArticleContext, type ArticleFilter, type CategoryFilter } from "../context/ArticleContext";
 import plusCalendarIcon from "../assets/calendar_plus_icon.png"
 import clockCalendarIcon from "../assets/clock-date-calendar-icon.png"
+import { useQuery } from "@tanstack/react-query";
+import { createPaginatedArticleQueryOptions } from "./query_options/articleQueryOptions";
+import { createCategoryQueryOptions } from "./query_options/categoryQueryOptions";
 
 
 
@@ -23,11 +24,11 @@ function ArticleCard({ article }: { article: Article }) {
             </div>
             <div id="datetimes">
                 <div className="flex side-by-side gap20 align-center">
-                    <img className="whitetint smallicon " src={clockCalendarIcon} />
+                    <img title="Data de atualização" className="whitetint smallicon " src={clockCalendarIcon} />
                     <p className="fontsmall">{new Date(article.updated).toLocaleString("pt-BR", { year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" })}</p>
                 </div>
                 <div className="flex side-by-side gap20 align-center">
-                    <img className="whitetint smallicon " src={plusCalendarIcon} />
+                    <img title="Data de criação" className="whitetint smallicon " src={plusCalendarIcon} />
                     <p className="fontsmall">{new Date(article.created).toLocaleString("pt-BR", { year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" })}</p>
                 </div>
                 <CategoryIconDisplays categoryIds={article.categories} />              
@@ -40,16 +41,10 @@ function ArticleCard({ article }: { article: Article }) {
 
 function ArticlesPage() {
     const navigate = useNavigate();
-    const artContext = useContext(ArticleContext);
-    if (!artContext)
-        throw new Error("Article context can't be null");
 
-    const searchedArticles = artContext.searchedArticles
-    const [filter, setFilter] = useState<ArticleFilter>(artContext.currentFilter);
-
-    useEffect(() => {
-        artContext.setFilter(filter)
-    },[filter])
+    
+    const [filter, setFilter] = useState<ArticleFilter>({page: 1, pageSize: 10, categoryFilters: [], dateSortType:1});
+    const {data, isLoading} = useQuery(createPaginatedArticleQueryOptions(filter))
 
     return (
         <div >
@@ -64,7 +59,7 @@ function ArticlesPage() {
             <div className="grid2fr">
                 <div className="articles-pageview">
                     <NewArticleButton onClick={() => { navigate("/article/create") }} />
-                    {searchedArticles.map(article => <ArticleCard key={article.id} article={article} />)}
+                        {isLoading ? (<div className="th-loader"><img className="mediumicon" src="https://raw.githubusercontent.com/n3r4zzurr0/svg-spinners/main/preview/ring-resize-white-36.svg"/></div>) : (<>{data?.map(article => <ArticleCard key={article.id} article={article} />)}</>)}                    
                 </div>
             </div>
         </div>
@@ -72,10 +67,8 @@ function ArticlesPage() {
 }
 
 function CategoryIconDisplays({ categoryIds }: { categoryIds: number[] }) {
-    const categoryContext = useContext(CategoryContext);
-    if (!categoryContext)
-        throw new Error("Category context can't be null")
-    const categories = categoryContext.categories.filter(x => categoryIds.includes(x.id))
+    const {data} = useQuery(createCategoryQueryOptions())
+    const categories = data?.filter(x => categoryIds.includes(x.id)) ?? []
     return <div className="flex side-by-side align-center gap10">
         {categories.map(cat => <img key={cat.id} className="smallicon" src={cat.icon} />)}
     </div>
@@ -141,10 +134,7 @@ function DateFilterButtons({ onCheckedDateFilterChanged }: { onCheckedDateFilter
 function CategoryFilterBoxes({ onCheckedFiltersChanged }: { onCheckedFiltersChanged: (checkedFilters: Set<number>) => void }) {
     try {
         const [filters, setFilters] = useState<Set<number>>(new Set())
-        const catContext = useContext(CategoryContext);
-        if (!catContext)
-            throw new Error("Category context can't be null");
-        const categories = catContext.categories
+        const {data} = useQuery(createCategoryQueryOptions())
         filters;
 
         function handleFilterChange(filter: CategoryFilter) {
@@ -164,7 +154,7 @@ function CategoryFilterBoxes({ onCheckedFiltersChanged }: { onCheckedFiltersChan
         return <div id="editor-category-filters" className="category-filters">
             <h3>Categoria:</h3>
             <br />
-            <>{categories.map(cat => <CategoryBox key={cat.id} category={cat} isChecked={(filter) => { handleFilterChange(filter) }} />)}</>
+            <>{data?.map(cat => <CategoryBox key={cat.id} category={cat} isChecked={(filter) => { handleFilterChange(filter) }} />)}</>
         </div>
 
     }

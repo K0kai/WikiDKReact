@@ -3,19 +3,22 @@ import { useNavigate } from 'react-router-dom';
 import { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import shield from "../assets/shield.png"
-import { ArticleContext } from '../context/ArticleContext';
 import type { ArticleGroup } from '../types/articleGroup';
 import type { ArticleGroupItem } from '../types/articleGroupItem';
-import { ArticleGroupContext } from '../context/ArticleGroupContext';
+import { useQuery } from '@tanstack/react-query';
+import { createArticleGroupQueryOptions } from './query_options/articleGroupQueryOptions';
+import { createGroupedArticleQueryOptions } from './query_options/articleQueryOptions';
+import { createArticleSubmissionCountQueryOptions } from './query_options/articleSubmissionsQueryOptions';
 
 function SidebarGroupItem({ articleItem }: { articleItem: ArticleGroupItem }) {
-    const articleContext = useContext(ArticleContext);
     const navigate = useNavigate();
-    const title = articleContext?.articles[articleItem.articleId].title;
+    const { data: articles } = useQuery(createGroupedArticleQueryOptions());
+
+    const article = articles?.find(a => a.id === articleItem.articleId);
 
     return (
         <button className="sb-item" onClick={() => navigate(`article/${articleItem.articleId}`)}>
-            {title ?? '...'}
+            {article?.title ?? '...'}
         </button>
     );
 }
@@ -45,19 +48,20 @@ function SidebarGroup({ articleGroup }: { articleGroup: ArticleGroup }) {
 function Sidebar() {
     const navigate = useNavigate();
     const authContext = useContext(AuthContext);
-    const articleGroupContext = useContext(ArticleGroupContext);
-    const [isPermitted, setIsPermitted] = useState(authContext?.hasRole(1));
+    const articleSubCountQuery = useQuery({...createArticleSubmissionCountQueryOptions(), refetchInterval:180000})
+    const [isPermitted, setIsPermitted] = useState(authContext?.hasRole(2));
+    const { data } = useQuery(createArticleGroupQueryOptions())
+
 
     useEffect(() => {
-        setIsPermitted(authContext?.hasRole(1));
+        setIsPermitted(authContext?.hasRole(2));
     }, [authContext]);
 
     return (
         <div className="sidebar">
             <div className="sb-section">
                 <div className="sb-section-label">Explorar</div>
-                {articleGroupContext?.groups
-                    .filter(g => g.displayOnSidebar)
+                {data?.filter(g => g.displayOnSidebar)
                     .map(g => <SidebarGroup key={g.id} articleGroup={g} />)
                 }
                 <div className="sb-divider" />
@@ -72,6 +76,22 @@ function Sidebar() {
                     <button className="sb-nav-btn" onClick={() => navigate('/manage')}>
                         <img className="sb-shield" src={shield} alt="" /> Gerenciar
                     </button>
+                    <button className="sb-nav-btn" onClick={() => navigate('/submissions')}>
+                        {(articleSubCountQuery?.data ?? 0) > 0 ? (<svg width="18" height="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="12" r="12" fill="#ED4245" />
+                            <text
+                                x="12"
+                                y="16"
+                                textAnchor="middle"
+                                fontFamily="Arial, sans-serif"
+                                fontSize="14"
+                                fontWeight="bold"
+                                fill="white">
+                                {(articleSubCountQuery?.data ?? 0) >= 10 ? ("9+") : (`${articleSubCountQuery?.data}`)}
+                            </text>
+                        </svg>) : (<></>)} Submissões
+                    </button>
+
                 </div>
             )}
         </div>

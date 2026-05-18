@@ -12,6 +12,8 @@ import ArticleEditor from './components/editors/ArticleEditor'
 import ManagerHub from './components/ManagerHub'
 import ArticleCreator from './components/editors/ArticleCreator'
 import UserProfile from './components/UserProfile'
+import Submissions from './components/Submissions'
+import SubmissionPreviewPage from './components/SubmissionPreview'
 
 function App() {
   return (
@@ -30,6 +32,8 @@ function App() {
             <Route path="/article/create" element={<ArticleCreator />} />
             <Route path="/manage" element={<ManagerHub />} />
             <Route path="/user" element={<UserProfile />} />
+            <Route path="/submissions" element={<Submissions/>}/>
+            <Route path="preview" element={<SubmissionPreviewPage/>}/>
           </Routes>
         </div>
       </div>

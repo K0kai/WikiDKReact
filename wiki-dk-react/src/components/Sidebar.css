@@ -1,5 +1,5 @@
 .sidebar {
-    width: 220px;
+    width: auto;
     background: var(--semiTrBg);
     border-right: 1px solid #1f1f26;
     display: flex;
@@ -7,7 +7,7 @@
     min-height: 100vh;
     font-family: 'Source Sans 3', sans-serif;
     position: relative;
-    top:-14px
+    top:-14px;
 }
 
 .sb-section {

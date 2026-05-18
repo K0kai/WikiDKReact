@@ -1,40 +1,37 @@
-import { AuthContext } from "../context/AuthContext";
-import { useState, useContext, useEffect } from "react";
+import { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import './ArticlePage.css';
 import ReactMarkdown from "react-markdown";
 import editIcon from "../assets/edit-icon.png"
 import trashIcon from "../assets/trash-icon.png"
-import type { Article } from "../types/article";
 import remarkGfm from "remark-gfm";
-import { ArticleContext } from "../context/ArticleContext";
+import { useQuery } from "@tanstack/react-query";
+import { createSingleArticleQueryOptions } from "./query_options/articleQueryOptions";
+import { deleteArticle } from "../api/articleAPI";
 
 
 
 
 
-function ArticlePage(){
-  const articleContext = useContext(ArticleContext);
-   const { id } = useParams<{ id: string }>();
-    const articleId = parseInt(id || '0');
-    const [article, setArticle] = useState<Article | null>(articleContext?.articles[articleId] ?? null);
+function ArticlePage() {
+  const { id } = useParams<{ id: string }>();
+  const articleId = parseInt(id || '0');
+  const {data} = useQuery(createSingleArticleQueryOptions(articleId));
+  const article = data
 
-    useEffect(() => {
-      setArticle(articleContext?.articles[articleId] ?? null)
+  useEffect(() => {
 
-    },[id])
-   
+  }, [id, article])
+
 
   function ManageButtons() {
     const navigate = useNavigate();
-    var authContext = useContext(AuthContext);
-    if (!authContext?.hasRole(1)) return null;
 
-    async function handleDelete(){
+    async function handleDelete() {
       var con = confirm("Essa ação é irreversível, deseja prosseguir?")
       if (!con)
         return;
-      var result = await articleContext?.deleteArticle(articleId);
+      var result = await deleteArticle(articleId);
       if (result){
         alert("Artigo deletado com sucesso!");
         navigate(-1);
