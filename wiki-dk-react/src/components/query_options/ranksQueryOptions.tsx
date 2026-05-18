@@ -1,5 +1,5 @@
 import { queryOptions } from "@tanstack/react-query";
-import type { Rank } from "../../context/RankContext";
+import type { Rank } from "../../types/rank"
 
 const API_URL = import.meta.env.VITE_API_URL
 
