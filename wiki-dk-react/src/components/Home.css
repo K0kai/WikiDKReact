@@ -164,7 +164,17 @@
   white-space: nowrap;
   margin-bottom: 30px;
 }
-.home-back-btn:hover { color: #eae7de; }
+.home-new-btn{
+  background: none;
+  border: none;
+  font-size: 0.8rem;
+  color: #c8b47a;
+  white-space: nowrap;
+  margin-bottom: 10px;
+  cursor: pointer;
+  padding:0
+}
+.home-back-btn:hover, .home-new-btn:hover { color: #eae7de; }
 
 .home-group-desc--hero {
   margin-bottom: 24px;

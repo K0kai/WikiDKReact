@@ -49,13 +49,13 @@ export function SubmissionPreviewPage() {
         </div>
         <div className="preview-categories">
           <h2>Categorias:</h2>
-          {categories.data?.map(cat => <div key={cat.id}>
+          {categories.data && categories.data.length > 0 && categories.data.map(cat => <div key={cat.id}>
             <img className="smallicon" src={cat.icon} /> {cat.name}
           </div>)}
         </div>
         <div className="preview-groups">
           <h2>Grupos:</h2>
-          {groups.data?.map(gr => <div key={gr.id}>
+          {groups.data && groups.data.length > 0 &&  groups.data.map(gr => <div key={gr.id}>
             {gr.title}
           </div>)}
         </div>

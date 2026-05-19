@@ -1,4 +1,4 @@
-import {  useState } from "react";
+import { useEffect, useState } from "react";
 import type { ArticleGroup } from "../types/articleGroup";
 import banner from "../assets/dkbanner.png";
 import "./Home.css";
@@ -7,13 +7,53 @@ import { useQuery } from "@tanstack/react-query";
 import { createSingleUserQueryOptions } from "./query_options/userQueryOptions";
 import { createArticleGroupQueryOptions } from "./query_options/articleGroupQueryOptions";
 import { createSingleArticleQueryOptions } from "./query_options/articleQueryOptions";
+import { type PageSection } from "../types/pageSection";
+import { createGetPageSectionsQueryOptions } from "./query_options/pageQueryOptions";
+
+function Section({ pgSection }:
+  { pgSection: PageSection }) {
+    return <div className="home-section-header">
+    <h2>{pgSection.title}</h2>
+  </div>
+
+}
+
+function SectionsContainer({ }) {  
+  var sectionsQuery = useQuery(createGetPageSectionsQueryOptions())
+  const [sections, setSections] = useState<PageSection[]>([])
+
+  function createNewFakeSection(){
+    var nSection : PageSection = {
+      title: "Lorem Ipsum",
+      content: "Nada",
+      isVisible: true,
+      slug: "",
+      order: 10,
+      id: (Math.random() * 10) + (Math.random() * 10)
+    }
+    setSections(prev => [...prev, nSection]);
+  }
+
+  useEffect(() => {
+    setSections(sectionsQuery.data ?? [])
+  },[])
+  
+  return <div className="sections-container">
+    <div className="home-section-header">
+      <button onClick={() => createNewFakeSection()} className="home-new-btn">+</button>
+      <h2>Nova sessão</h2>
+    </div>
+    {sections.map(s => <Section key={s.id} pgSection={s}/>)}
+
+  </div>
+}
 
 function ArticleCard({ articleId }: { articleId: number }) {
 
   var articleQuery = useQuery(createSingleArticleQueryOptions(articleId));
-  const article = articleQuery.data  
+  const article = articleQuery.data
   var userQuery = useQuery(createSingleUserQueryOptions(article?.authorId))
-  var editorQuery =  useQuery(createSingleUserQueryOptions(article?.lastEditorId));
+  var editorQuery = useQuery(createSingleUserQueryOptions(article?.lastEditorId));
 
   const navigate = useNavigate();
   return <div onClick={() => navigate(`article/${article?.id}`)} key={article?.id} className="home-article-card">
@@ -50,16 +90,16 @@ function Home() {
   const homeGroups = groupQuery.data?.filter(g => g.displayOnHome)
   const groupItems = groupQuery.data?.flatMap(a => a.items);
   const selectedGroupItems = groupItems?.filter(gi => gi?.articleGroupId == selectedGroup?.id)
-  
+
 
   if (groupQuery.isLoading)
-    return <div className="th-loader"> <img className="mediumicon" src="https://raw.githubusercontent.com/n3r4zzurr0/svg-spinners/main/preview/ring-resize-white-36.svg"/> </div>
+    return <div className="th-loader"> <img className="mediumicon" src="https://raw.githubusercontent.com/n3r4zzurr0/svg-spinners/main/preview/ring-resize-white-36.svg" /> </div>
 
   return (
     <div className="home-page">
       <img className="Banner" src={banner} />
       <div className="home-content">
-        
+
         {selectedGroup ? (
           <>
             <div className="home-section-header">
@@ -80,6 +120,7 @@ function Home() {
           </>
         ) : (
           <>
+            <SectionsContainer />
             <div className="home-section-header"><h2>Importantes</h2></div>
             <div className="home-groups-grid">
               {homeGroups?.map((group) => (
